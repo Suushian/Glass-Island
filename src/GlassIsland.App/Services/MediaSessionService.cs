@@ -223,7 +223,7 @@ public sealed class MediaSessionService : IAsyncDisposable
             _session.PlaybackInfoChanged -= Session_PlaybackInfoChanged;
         }
 
-        _bindGate.Dispose();
+        // Do not dispose the semaphore here: a session-change callback may still be unwinding.
         return ValueTask.CompletedTask;
     }
 }
