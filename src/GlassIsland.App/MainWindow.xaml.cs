@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using GlassIsland.App.Services;
 using Forms = System.Windows.Forms;
 
 namespace GlassIsland.App;
@@ -17,6 +18,7 @@ public partial class MainWindow : Window
 
     private readonly Forms.ContextMenuStrip _trayMenu;
     private readonly Forms.NotifyIcon _trayIcon;
+    private readonly MediaSessionService _mediaService = new();
     private bool _isExpanded;
     private bool _allowClose;
     private bool _disposed;
@@ -40,16 +42,51 @@ public partial class MainWindow : Window
         };
         _trayIcon.DoubleClick += TrayIcon_DoubleClick;
 
+        _mediaService.StateChanged += MediaService_StateChanged;
         Loaded += MainWindow_Loaded;
         Closing += MainWindow_Closing;
         SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
     }
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         PositionWindow();
         Height = CollapsedHeight;
+        await _mediaService.InitializeAsync();
     }
+
+    private void MediaService_StateChanged(object? sender, MediaSnapshot snapshot)
+    {
+        if (Dispatcher.HasShutdownStarted)
+        {
+            return;
+        }
+
+        if (Dispatcher.CheckAccess())
+        {
+            ApplyMediaSnapshot(snapshot);
+        }
+        else
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => ApplyMediaSnapshot(snapshot)));
+        }
+    }
+
+    private void ApplyMediaSnapshot(MediaSnapshot snapshot)
+    {
+        MediaTitleText.Text = snapshot.Title;
+        MediaArtistText.Text = snapshot.Artist;
+        MediaPlayPauseButton.Content = snapshot.IsPlaying ? "Ⅱ" : "▶";
+        MediaPlayPauseButton.IsEnabled = snapshot.IsAvailable && snapshot.CanTogglePlayback;
+        MediaPreviousButton.IsEnabled = snapshot.IsAvailable && snapshot.CanSkipPrevious;
+        MediaNextButton.IsEnabled = snapshot.IsAvailable && snapshot.CanSkipNext;
+    }
+
+    private async void MediaPlayPause_Click(object sender, RoutedEventArgs e) => await _mediaService.PlayPauseAsync();
+
+    private async void MediaPrevious_Click(object sender, RoutedEventArgs e) => await _mediaService.PreviousAsync();
+
+    private async void MediaNext_Click(object sender, RoutedEventArgs e) => await _mediaService.NextAsync();
 
     private void ToggleButton_Click(object sender, RoutedEventArgs e)
     {
@@ -205,6 +242,8 @@ public partial class MainWindow : Window
         }
 
         _disposed = true;
+        _mediaService.StateChanged -= MediaService_StateChanged;
+        _ = _mediaService.DisposeAsync();
         SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
         _trayIcon.DoubleClick -= TrayIcon_DoubleClick;
         _trayIcon.Visible = false;
