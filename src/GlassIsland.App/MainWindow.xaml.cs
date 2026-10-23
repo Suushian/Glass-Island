@@ -55,7 +55,7 @@ public partial class MainWindow : Window
         await _mediaService.InitializeAsync();
     }
 
-    private void MediaService_StateChanged(object? sender, MediaSnapshot snapshot)
+    private void MediaService_StateChanged(MediaSnapshot snapshot)
     {
         if (Dispatcher.HasShutdownStarted)
         {
