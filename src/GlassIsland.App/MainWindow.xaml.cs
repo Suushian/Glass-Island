@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private const double ExpandedHeight = 264;
     private static readonly TimeSpan MotionDuration = TimeSpan.FromMilliseconds(240);
 
+    private readonly Forms.ContextMenuStrip _trayMenu;
     private readonly Forms.NotifyIcon _trayIcon;
     private bool _isExpanded;
     private bool _allowClose;
@@ -24,17 +25,17 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        var trayMenu = new Forms.ContextMenuStrip();
-        trayMenu.Items.Add("نمایش GlassIsland", null, (_, _) => ShowFromTray());
-        trayMenu.Items.Add("مخفی‌کردن", null, (_, _) => Hide());
-        trayMenu.Items.Add(new Forms.ToolStripSeparator());
-        trayMenu.Items.Add("خروج", null, (_, _) => ExitApplication());
+        _trayMenu = new Forms.ContextMenuStrip();
+        _trayMenu.Items.Add("نمایش GlassIsland", null, (_, _) => ShowFromTray());
+        _trayMenu.Items.Add("مخفی‌کردن", null, (_, _) => Hide());
+        _trayMenu.Items.Add(new Forms.ToolStripSeparator());
+        _trayMenu.Items.Add("خروج", null, (_, _) => ExitApplication());
 
         _trayIcon = new Forms.NotifyIcon
         {
             Text = "GlassIsland",
             Icon = SystemIcons.Application,
-            ContextMenuStrip = trayMenu,
+            ContextMenuStrip = _trayMenu,
             Visible = true
         };
         _trayIcon.DoubleClick += TrayIcon_DoubleClick;
@@ -67,7 +68,7 @@ public partial class MainWindow : Window
         _isExpanded = true;
         ExpandedPanel.Visibility = Visibility.Visible;
         Chevron.Text = "⌃";
-        AnimatePanelOpacity(0, 1, null);
+        AnimatePanelOpacity(ExpandedPanel.Opacity, 1, null);
         AnimateWindowHeight(ExpandedHeight);
     }
 
@@ -208,5 +209,6 @@ public partial class MainWindow : Window
         _trayIcon.DoubleClick -= TrayIcon_DoubleClick;
         _trayIcon.Visible = false;
         _trayIcon.Dispose();
+        _trayMenu.Dispose();
     }
 }
