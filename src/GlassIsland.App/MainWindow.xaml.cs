@@ -118,7 +118,7 @@ public partial class MainWindow : Window
         BeginAnimation(HeightProperty, animation);
     }
 
-    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key == Key.Escape && _isExpanded)
         {
