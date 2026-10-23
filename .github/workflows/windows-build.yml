@@ -1,0 +1,52 @@
+name: Windows build
+
+on:
+  push:
+    branches:
+      - main
+      - "feat/**"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore .\\GlassIsland.sln
+
+      - name: Build Release
+        run: dotnet build .\\GlassIsland.sln --configuration Release --no-restore
+
+      - name: Publish Debug executable (Windows x64)
+        run: >-
+          dotnet publish .\\src\\GlassIsland.App\\GlassIsland.App.csproj
+          --configuration Debug
+          --runtime win-x64
+          --self-contained true
+          --output .\\artifacts\\GlassIsland-Debug
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:IncludeAllContentForSelfExtract=true
+          -p:DebugType=portable
+
+      - name: Upload Debug executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: GlassIsland-Debug-win-x64
+          path: artifacts/GlassIsland-Debug/
+          if-no-files-found: error
+          retention-days: 14
