@@ -23,7 +23,7 @@ public sealed class MediaSessionService : IAsyncDisposable
     private GlobalSystemMediaTransportControlsSession? _session;
     private bool _disposed;
 
-    public event EventHandler<MediaSnapshot>? StateChanged;
+    public event Action<MediaSnapshot>? StateChanged;
 
     public MediaSnapshot Current { get; private set; } =
         new("هیچ رسانه‌ای پخش نمی‌شود", "یک برنامهٔ رسانه‌ای را اجرا کنید", false, false, false, false, false, "Unavailable");
@@ -194,7 +194,7 @@ public sealed class MediaSessionService : IAsyncDisposable
     private void Publish(MediaSnapshot snapshot)
     {
         Current = snapshot;
-        StateChanged?.Invoke(this, snapshot);
+        StateChanged?.Invoke(snapshot);
     }
 
     public ValueTask DisposeAsync()
