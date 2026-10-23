@@ -18,12 +18,12 @@
 - [ ] Verify focus behavior and responsiveness on Windows.
 **Exit:** no off-screen placement after monitor changes; no focus stealing during passive updates; shell remains responsive when integrations are unavailable.
 
-**Status:** first implementation committed; this milestone is not considered fully verified until Windows build and manual acceptance checks pass. Current placement defaults to the primary display.
+**Status:** initial implementation committed; a CI compiler error (`KeyEventArgs` ambiguity) was fixed on the Phase 1 branch. The follow-up Windows build result and manual acceptance checks are still pending. Current placement defaults to the primary display.
 
 ## Milestone 2 — media and audio
-- Enumerate supported media sessions and show metadata/state.
-- Transport commands where supported.
-- Read/set volume and mute; subscribe to endpoint changes.
+- [x] Read current GSMTC session metadata/playback state and expose supported previous/play-pause/next commands in the shell (source added; Windows build/runtime validation pending).
+- [ ] Verify session changes, missing metadata, unsupported commands, and event cleanup on Windows.
+- [ ] Read/set default output volume and mute; subscribe to endpoint and default-device changes.
 **Exit:** success and unavailable cases tested; event subscriptions are cleaned up; no idle polling loop.
 
 ## Milestone 3 — notification proof-of-concept
