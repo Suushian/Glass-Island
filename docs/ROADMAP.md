@@ -3,22 +3,24 @@
 ## Milestone 0 — repository baseline
 - [x] Add source structure and reproducible build instructions.
 - [x] Add a Windows Release build workflow.
-- [ ] Build on a clean Windows development machine.
+- [x] Confirm successful Windows CI Release build and x64 Debug publish.
 - [ ] Record baseline startup time, working set, and idle CPU.
 **Exit:** Release build succeeds; machine/OS are recorded; no unmeasured performance claims.
 
-**Status:** source structure and CI workflow are committed on the Phase 1 branch; Windows build verification remains pending.
+**Status:** CI build and publish succeeded on Windows GitHub Actions. Performance baselines remain unmeasured.
 
 ## Milestone 1 — stable shell
 - [x] Borderless topmost WPF window and collapsed/expanded interaction.
 - [x] Tray show/hide/exit and explicit unavailable states for later integrations.
 - [x] Eased transitions with no idle animation loop.
 - [x] Reposition on display-settings changes and declare per-monitor DPI awareness.
+- [x] Wire application startup to `MainWindow.xaml` and verify the published executable launches.
+- [x] Verify basic startup, visible overlay, expand/collapse, Escape-to-collapse, and tray Exit on Windows (user-reported manual acceptance).
 - [ ] Verify no off-screen placement across monitor changes and mixed-DPI configurations.
 - [ ] Verify focus behavior and responsiveness on Windows.
 **Exit:** no off-screen placement after monitor changes; no focus stealing during passive updates; shell remains responsive when integrations are unavailable.
 
-**Status:** first implementation committed; this milestone is not considered fully verified until Windows build and manual acceptance checks pass. Current placement defaults to the primary display.
+**Status:** Phase 1 basic acceptance is complete: Windows CI passed and user-reported manual smoke tests passed. Advanced multi-monitor/mixed-DPI and focus behavior remain explicit follow-up validation items. Current placement defaults to the primary display.
 
 ## Milestone 2 — media and audio
 - Enumerate supported media sessions and show metadata/state.
