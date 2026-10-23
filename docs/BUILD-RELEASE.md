@@ -1,33 +1,44 @@
 # Build, Run, and Release
 
 ## Prerequisites
-Windows 10/11 development machine, .NET SDK matching the target framework, Git, and Visual Studio 2022 with the .NET desktop workload or a compatible editor.
+
+- Windows 10/11 development machine.
+- .NET 8 SDK.
+- Git and Visual Studio 2022 with the .NET desktop workload, or a compatible editor.
 
 Check the environment:
+
 ```powershell
 dotnet --info
 dotnet --list-sdks
 ```
 
-## Intended build commands
-Once the solution and source project have been added:
+## Build and run
+
 ```powershell
 dotnet restore .\GlassIsland.sln
 dotnet build .\GlassIsland.sln -c Debug
 dotnet build .\GlassIsland.sln -c Release
-dotnet test .\GlassIsland.sln -c Release
+dotnet run --project .\src\GlassIsland.App\GlassIsland.App.csproj
 ```
-The proposed application path is `src/GlassIsland.App/GlassIsland.App.csproj`; update this documentation if the implemented layout differs. These commands are not currently validated because source/solution files are not yet in this repository.
+
+The WPF app targets `net8.0-windows`. A Windows GitHub Actions workflow builds the solution in Release configuration. The local build and runtime still need confirmation on Windows; a CI workflow definition alone is not evidence of a successful build.
+
+There is not yet a test project, so `dotnet test` does not provide meaningful coverage at this stage.
 
 ## Publish options
+
 Choose only after runtime and distribution requirements are known:
+
 ```powershell
 dotnet publish .\src\GlassIsland.App\GlassIsland.App.csproj -c Release -r win-x64 --self-contained false
 dotnet publish .\src\GlassIsland.App\GlassIsland.App.csproj -c Release -r win-x64 --self-contained true
 ```
+
 Self-contained builds include the runtime and usually increase artifact size; they do not guarantee lower memory use or faster startup.
 
 ## Release checklist
+
 - [ ] Clean Release build on a clean machine.
 - [ ] Supported Windows versions documented.
 - [ ] Media/audio/notification scenarios tested.
@@ -39,4 +50,5 @@ Self-contained builds include the runtime and usually increase artifact size; th
 - [ ] Known limitations and rollback/update policy documented.
 
 ## Versioning
+
 Use Semantic Versioning where practical and preserve the source revision associated with every binary release.
