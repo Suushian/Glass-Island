@@ -1,0 +1,159 @@
+<Window x:Class="GlassIsland.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="GlassIsland"
+        Width="430"
+        Height="88"
+        MinWidth="430"
+        MaxWidth="430"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        WindowStartupLocation="Manual"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <Style x:Key="HeaderButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="16">
+                            <ContentPresenter HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.92" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Opacity" Value="0.78" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="FeatureCardStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FF171B25" />
+            <Setter Property="BorderBrush" Value="#1FFFFFFF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="15" />
+            <Setter Property="Padding" Value="12,11" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="8">
+        <Border x:Name="ShellSurface"
+                Background="#F20D1017"
+                BorderBrush="#35FFFFFF"
+                BorderThickness="1"
+                CornerRadius="26"
+                Padding="16,11">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="22" ShadowDepth="4" Opacity="0.36" Color="#FF000000" />
+            </Border.Effect>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="48" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Button x:Name="ToggleButton"
+                        Grid.Row="0"
+                        Style="{StaticResource HeaderButtonStyle}"
+                        Click="ToggleButton_Click"
+                        AutomationProperties.Name="گسترش یا جمع‌کردن GlassIsland">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="42" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="34" Height="34" CornerRadius="12"
+                                Background="#24B6A4FF"
+                                BorderBrush="#55B6A4FF"
+                                BorderThickness="1"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="G"
+                                       FontSize="17"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource Accent}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0">
+                            <TextBlock Text="GlassIsland"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                <Ellipse Width="5" Height="5" Fill="#FF8BD5B0" VerticalAlignment="Center" />
+                                <TextBlock Text="  Shell آماده است"
+                                           FontSize="10.5"
+                                           Foreground="{StaticResource TextSecondary}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock x:Name="Chevron"
+                                   Grid.Column="2"
+                                   Text="⌄"
+                                   FontSize="20"
+                                   Foreground="#FF9CA5B5"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,4,3" />
+                    </Grid>
+                </Button>
+
+                <StackPanel x:Name="ExpandedPanel"
+                            Grid.Row="1"
+                            Visibility="Collapsed"
+                            Opacity="0"
+                            Margin="0,12,0,0">
+                    <Border Height="1" Background="#20FFFFFF" Margin="0,0,0,12" />
+                    <TextBlock Text="دسترسی سریع"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondary}"
+                               Margin="2,0,0,9" />
+                    <UniformGrid Columns="3" Rows="1">
+                        <Border Style="{StaticResource FeatureCardStyle}" Margin="0,0,5,0">
+                            <StackPanel>
+                                <TextBlock Text="MEDIA" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
+                                <TextBlock Text="کنترل موسیقی" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,6,0,3" />
+                                <TextBlock Text="در فاز ۲" FontSize="10" Foreground="{StaticResource TextSecondary}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource FeatureCardStyle}" Margin="3,0">
+                            <StackPanel>
+                                <TextBlock Text="AUDIO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
+                                <TextBlock Text="صدای سیستم" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,6,0,3" />
+                                <TextBlock Text="در فاز ۲" FontSize="10" Foreground="{StaticResource TextSecondary}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource FeatureCardStyle}" Margin="5,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="ALERTS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
+                                <TextBlock Text="اعلان‌ها" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,6,0,3" />
+                                <TextBlock Text="در فاز ۳" FontSize="10" Foreground="{StaticResource TextSecondary}" />
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+                    <TextBlock Text="قابلیت‌های متصل‌نشده عمداً غیرفعال هستند."
+                               FontSize="10"
+                               Foreground="#FF7F899A"
+                               Margin="2,11,0,1" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
