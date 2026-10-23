@@ -129,8 +129,24 @@
                         <Border Style="{StaticResource FeatureCardStyle}" Margin="0,0,5,0">
                             <StackPanel>
                                 <TextBlock Text="MEDIA" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
-                                <TextBlock Text="کنترل موسیقی" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,6,0,3" />
-                                <TextBlock Text="در فاز ۲" FontSize="10" Foreground="{StaticResource TextSecondary}" />
+                                <TextBlock x:Name="MediaTitleText" Text="هیچ رسانه‌ای پخش نمی‌شود"
+                                           FontSize="10.5" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"
+                                           Margin="0,6,0,2" TextTrimming="CharacterEllipsis" />
+                                <TextBlock x:Name="MediaArtistText" Text="یک برنامهٔ رسانه‌ای را اجرا کنید"
+                                           FontSize="9" Foreground="{StaticResource TextSecondary}"
+                                           TextTrimming="CharacterEllipsis" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                                    <Button x:Name="MediaPreviousButton" Content="⏮" Width="24" Height="24"
+                                            Margin="0,0,4,0" IsEnabled="False" Click="MediaPrevious_Click"
+                                            AutomationProperties.Name="رسانهٔ قبلی" />
+                                    <Button x:Name="MediaPlayPauseButton" Content="▶" Width="28" Height="24"
+                                            Margin="0,0,4,0" IsEnabled="False" Click="MediaPlayPause_Click"
+                                            AutomationProperties.Name="پخش یا مکث" />
+                                    <Button x:Name="MediaNextButton" Content="⏭" Width="24" Height="24"
+                                            IsEnabled="False" Click="MediaNext_Click"
+                                            AutomationProperties.Name="رسانهٔ بعدی" />
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                         <Border Style="{StaticResource FeatureCardStyle}" Margin="3,0">
