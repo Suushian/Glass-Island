@@ -1,0 +1,22 @@
+{
+  "project": "GlassIsland",
+  "package": "Project documentation baseline",
+  "language": "English (technical documentation)",
+  "format": "Markdown",
+  "status": "Architecture and documentation proposal; implementation claims are explicitly qualified",
+  "documents": [
+    "README.md",
+    "docs/ADR.md",
+    "docs/ARCHITECTURE.md",
+    "docs/BUILD-RELEASE.md",
+    "docs/GLOSSARY.md",
+    "docs/PRODUCT.md",
+    "docs/REPOSITORY-STRUCTURE.md",
+    "docs/REQUIREMENTS.md",
+    "docs/RISKS.md",
+    "docs/ROADMAP.md",
+    "docs/SECURITY-PRIVACY.md",
+    "docs/TESTING.md",
+    "docs/UX-DESIGN.md"
+  ]
+}
