@@ -22,9 +22,13 @@ dotnet build .\GlassIsland.sln -c Release
 dotnet run --project .\src\GlassIsland.App\GlassIsland.App.csproj
 ```
 
-The WPF app targets `net8.0-windows`. A Windows GitHub Actions workflow builds the solution in Release configuration. The local build and runtime still need confirmation on Windows; a CI workflow definition alone is not evidence of a successful build.
+The WPF app targets `net8.0-windows`. GitHub Actions builds the solution in Release configuration and publishes a self-contained Windows x64 Debug executable. The latest recorded run succeeded, and the user confirmed the published executable starts and passes the basic shell smoke tests on Windows. This does not establish compatibility with every Windows build or display configuration.
 
 There is not yet a test project, so `dotnet test` does not provide meaningful coverage at this stage.
+
+## Published Debug artifact
+
+The workflow artifact is named `GlassIsland-Debug-win-x64` and is retained by GitHub Actions for 14 days. Download the ZIP from the successful workflow run, extract it into a separate directory, and launch `GlassIsland.exe`. The current artifact is self-contained; it includes the .NET runtime and can be larger than a framework-dependent publish. The artifact is a CI test build, not a signed installer or production release.
 
 ## Publish options
 
