@@ -4,7 +4,7 @@
 
 GlassIsland is a Windows desktop utility with a compact floating surface near the top-center of the display. The MVP target is a minimal, smoothly animated shell with controls for the active supported media session, system output volume, and Windows notifications where documented APIs and permissions allow them.
 
-> **Current status:** Phase 1 shell source has been added. It has not yet been built or visually verified on Windows in this environment. Media controls, system audio integration, and notification support are not implemented yet; see the [Phase 1 report](docs/PHASE-1-REPORT.md).
+> **Current status:** The Phase 1 shell has a known CI compiler error fix, but the follow-up Windows build result is still pending. Initial event-driven control of the current Windows media session has been added on the Phase 2 development branch; system output volume and notifications are not implemented yet. Manual Windows runtime checks remain outstanding. See the [roadmap](docs/ROADMAP.md) and [Phase 1 report](docs/PHASE-1-REPORT.md).
 
 ## Run locally
 
@@ -16,7 +16,7 @@ dotnet build .\GlassIsland.sln -c Release
 dotnet run --project .\src\GlassIsland.App\GlassIsland.App.csproj
 ```
 
-The app currently provides a floating shell, expand/collapse interaction, tray show/hide/exit, and visible placeholders for features planned in later phases.
+The app provides a floating shell, expand/collapse interaction, and tray show/hide/exit. The Phase 2 development branch adds current-session media metadata and supported transport controls; system audio remains a placeholder.
 
 ## Documentation
 - [Product requirements](docs/PRODUCT.md)
