@@ -4,7 +4,7 @@
 
 GlassIsland is a Windows desktop utility with a compact floating surface near the top-center of the display. The MVP target is a minimal, smoothly animated shell with controls for the active supported media session, system output volume, and Windows notifications where documented APIs and permissions allow them.
 
-> **Current status:** Phase 1 shell source has been added. It has not yet been built or visually verified on Windows in this environment. Media controls, system audio integration, and notification support are not implemented yet; see the [Phase 1 report](docs/PHASE-1-REPORT.md).
+> **Current status:** Phase 1 stable-shell implementation is complete and has passed a Windows CI build plus user-reported manual smoke tests on Windows. Startup is wired through `StartupUri="MainWindow.xaml"`. Media controls and system audio remain Phase 2; notification support remains Phase 3. See the [Phase 1 report](docs/PHASE-1-REPORT.md).
 
 ## Run locally
 
@@ -16,7 +16,7 @@ dotnet build .\GlassIsland.sln -c Release
 dotnet run --project .\src\GlassIsland.App\GlassIsland.App.csproj
 ```
 
-The app currently provides a floating shell, expand/collapse interaction, tray show/hide/exit, and visible placeholders for features planned in later phases.
+The app provides a floating shell, expand/collapse interaction, tray show/hide/exit, and visible placeholders for features planned in later phases.
 
 ## Documentation
 - [Product requirements](docs/PRODUCT.md)
@@ -42,7 +42,11 @@ The app currently provides a floating shell, expand/collapse interaction, tray s
 6. **Evidence-based:** performance and compatibility claims require repeatable tests.
 
 ## Planned stack
+
 C# / WPF on .NET 8 for the initial shell; GSMTC for supported media sessions; Windows Core Audio for endpoint volume; notification implementation gated on a technical proof-of-concept.
 
-## Validation
-A Windows GitHub Actions workflow builds the solution in Release configuration. Local build success, runtime behavior, multi-monitor/DPI behavior, and performance remain unverified until the workflow and Windows manual checks complete.
+## Validation status
+
+- **Windows CI:** Release build and self-contained Windows x64 Debug publish succeeded in GitHub Actions (run [40016330117](https://github.com/Suushian/Glass-Island/actions/runs/40016330117)).
+- **Manual smoke test:** user confirmed the app starts and is visible, expand/collapse works, Escape collapses the surface, and tray Exit closes it.
+- **Not yet verified:** mixed-DPI multi-monitor edge cases, performance measurements, full compatibility matrix, automated test coverage, installer/signing, and integrations assigned to later phases.
