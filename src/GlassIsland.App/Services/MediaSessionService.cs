@@ -21,7 +21,7 @@ public sealed class MediaSessionService : IAsyncDisposable
     private readonly SemaphoreSlim _bindGate = new(1, 1);
     private GlobalSystemMediaTransportControlsSessionManager? _manager;
     private GlobalSystemMediaTransportControlsSession? _session;
-    private bool _disposed;
+    private volatile bool _disposed;
 
     public event Action<MediaSnapshot>? StateChanged;
 
