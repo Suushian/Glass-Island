@@ -26,7 +26,7 @@ public sealed class MediaSessionService : IAsyncDisposable
     public event Action<MediaSnapshot>? StateChanged;
 
     public MediaSnapshot Current { get; private set; } =
-        new("هیچ رسانه‌ای پخش نمی‌شود", "یک برنامهٔ رسانه‌ای را اجرا کنید", false, false, false, false, false, "Unavailable");
+        new("Nothing playing right now", "Play something and it'll show up here", false, false, false, false, false, "Unavailable");
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -56,7 +56,7 @@ public sealed class MediaSessionService : IAsyncDisposable
         }
         catch
         {
-            PublishUnavailable("دسترسی به نشست رسانه‌ای ویندوز در دسترس نیست");
+            PublishUnavailable("Windows media controls aren't available right now");
         }
     }
 
@@ -153,7 +153,7 @@ public sealed class MediaSessionService : IAsyncDisposable
         }
         catch
         {
-            PublishUnavailable("خواندن وضعیت رسانه با خطا مواجه شد");
+            PublishUnavailable("Couldn't read the media status");
         }
         finally
         {
@@ -191,7 +191,7 @@ public sealed class MediaSessionService : IAsyncDisposable
         var session = _session;
         if (session is null)
         {
-            PublishUnavailable("هیچ نشست رسانه‌ای فعالی پیدا نشد");
+            PublishUnavailable("No active media session found");
             return;
         }
 
@@ -220,12 +220,12 @@ public sealed class MediaSessionService : IAsyncDisposable
             if (title is null)
             {
                 var sourceName = GetSourceDisplayName(session.SourceAppUserModelId);
-                title = sourceName is null ? "رسانهٔ فعال" : $"رسانهٔ فعال از {sourceName}";
+                title = sourceName is null ? "Active media" : $"Active media از {sourceName}";
             }
 
             if (artist is null)
             {
-                artist = hasTrackTitle ? "هنرمند ارائه نشده" : "اطلاعات آهنگ ارائه نشده";
+                artist = hasTrackTitle ? "Artist not provided" : "Track details aren't available";
             }
 
             Publish(new MediaSnapshot(
@@ -242,7 +242,7 @@ public sealed class MediaSessionService : IAsyncDisposable
         {
             if (!_disposed && ReferenceEquals(session, _session))
             {
-                PublishUnavailable("اطلاعات رسانه در دسترس نیست");
+                PublishUnavailable("Media details aren't available");
             }
         }
     }
@@ -265,9 +265,9 @@ public sealed class MediaSessionService : IAsyncDisposable
             "unknown performer",
             "n/a",
             "not available",
-            "نامشخص",
-            "عنوان نامشخص",
-            "هنرمند نامشخص"
+            "unknown",
+            "عنوان unknown",
+            "هنرمند unknown"
         };
 
         return placeholders.Contains(normalized, StringComparer.OrdinalIgnoreCase)
@@ -295,7 +295,7 @@ public sealed class MediaSessionService : IAsyncDisposable
     }
 
     private void PublishUnavailable(string status) =>
-        Publish(new MediaSnapshot("هیچ رسانه‌ای پخش نمی‌شود", status, false, false, false, false, false, "Unavailable"));
+        Publish(new MediaSnapshot("Nothing playing right now", status, false, false, false, false, false, "Unavailable"));
 
     private void Publish(MediaSnapshot snapshot)
     {
