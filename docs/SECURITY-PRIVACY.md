@@ -6,7 +6,7 @@ The first release should require no account, network service, analytics, or remo
 ## Notification privacy
 - Use documented APIs and comply with permissions.
 - Never read private notification stores or bypass platform controls.
-- Keep message previews off by default until implications are clearly explained, or require explicit opt-in.
+- Before requesting Windows notification access, clearly explain that GlassIsland can display notification content from supported apps. Treat the Windows permission prompt as the explicit consent gate; do not silently suppress all previews behind a second opt-in.
 - Offer app-only previews where feasible.
 - Avoid persistence of notification content and redact diagnostics.
 
