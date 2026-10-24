@@ -167,16 +167,63 @@
                         </Border>
                         <Border Style="{StaticResource FeatureCardStyle}" Margin="5,0,0,0">
                             <StackPanel>
-                                <TextBlock Text="ALERTS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
-                                <TextBlock Text="Notifications" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,6,0,3" />
-                                <TextBlock Text="Coming up next" FontSize="10" Foreground="{StaticResource TextSecondary}" />
+                                <TextBlock Text="NOTIFICATIONS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
+                                <TextBlock x:Name="NotificationCountText" Text="Coming up next" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,6,0,3" />
+                                <TextBlock Text="From your apps" FontSize="10" Foreground="{StaticResource TextSecondary}" />
                             </StackPanel>
                         </Border>
                     </UniformGrid>
+                    <TextBlock x:Name="NotificationStatusText"
+                               Text="Your notifications will show up here."
+                               FontSize="10"
+                               Foreground="{StaticResource TextSecondary}"
+                               Margin="2,12,0,7"
+                               TextWrapping="Wrap" />
+                    <ScrollViewer MaxHeight="155"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl x:Name="NotificationItemsControl">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#FF171B25"
+                                            BorderBrush="#20FFFFFF"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="10,8"
+                                            Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <DockPanel LastChildFill="True">
+                                                <TextBlock Text="{Binding CreatedAt, StringFormat={}{0:g}}"
+                                                           DockPanel.Dock="Right"
+                                                           FontSize="9"
+                                                           Foreground="{StaticResource TextSecondary}"
+                                                           Margin="8,0,0,0" />
+                                                <TextBlock Text="{Binding AppName}"
+                                                           FontSize="9"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource Accent}"
+                                                           TextTrimming="CharacterEllipsis" />
+                                            </DockPanel>
+                                            <TextBlock Text="{Binding Title}"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextPrimary}"
+                                                       Margin="0,4,0,2"
+                                                       TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Body}"
+                                                       FontSize="10"
+                                                       Foreground="{StaticResource TextSecondary}"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                     <TextBlock Text="Media and audio controls depend on what Windows and your device support."
                                FontSize="10"
                                Foreground="#FF7F899A"
-                               Margin="2,11,0,1" />
+                               Margin="2,8,0,1" />
                 </StackPanel>
             </Grid>
         </Border>
