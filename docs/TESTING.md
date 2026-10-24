@@ -20,6 +20,20 @@
 | Startup disabled | No stale app-owned registration |
 | Shutdown | Native resources and subscriptions released |
 
+## Phase 2 Windows integration scenarios
+| Scenario | Expected behavior |
+|---|---|
+| No current media session | Shell remains usable; media controls are disabled |
+| Session appears, changes, or disappears | Metadata/playback state refreshes; stale session data is not retained |
+| Missing title/artist | Safe fallback text; no crash |
+| Player does not support a transport command | Unsupported control is disabled or command failure leaves shell usable |
+| External volume or mute change | Slider and mute label update from endpoint notifications |
+| User changes volume or mute | Default multimedia output endpoint reflects the requested value |
+| Default output device changes or disappears | Adapter rebinds or displays an explicit unavailable state |
+| App exits during callbacks | Media/audio event subscriptions and endpoint resources are released |
+
+These scenarios require manual execution on Windows; the current GitHub workflow validates compilation and publishing, not runtime integration behavior.
+
 ## Performance protocol
 Record Windows build, hardware, display scaling, power mode, and configuration. Warm up, measure idle for a fixed interval (e.g. five minutes), repeat at least three times, and report median/range. Record cold start to first frame, working set, idle/peak CPU, background threads/timers, media-update CPU, and backdrop/album-art impact. Compare backdrop on/off. Store raw results in a versioned report.
 
