@@ -13,7 +13,7 @@ namespace GlassIsland.App;
 public partial class MainWindow : Window
 {
     private const double CollapsedHeight = 88;
-    private const double ExpandedHeight = 264;
+    private const double ExpandedHeight = 300;
     private static readonly TimeSpan MotionDuration = TimeSpan.FromMilliseconds(240);
 
     private readonly Forms.ContextMenuStrip _trayMenu;
@@ -134,7 +134,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void AudioVolumeSlider_KeyUp(object sender, KeyEventArgs e)
+    private async void AudioVolumeSlider_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown)
         {
