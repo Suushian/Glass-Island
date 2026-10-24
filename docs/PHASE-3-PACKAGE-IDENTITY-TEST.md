@@ -53,13 +53,15 @@ For each run, record only non-sensitive metadata:
 
 | Field | Value |
 |---|---|
-| Windows version/build | Not tested yet |
-| WinApp CLI version | Not tested yet |
-| App package identity confirmed | Not tested yet |
-| Capability present in installed package | Not tested yet |
+| Windows version/build | CI registration smoke test passed on Windows Server 2025 (build 26100); target Windows machine not tested |
+| WinApp CLI version | Installed through the Microsoft setup-WinAppCli GitHub Action; exact CLI version not recorded |
+| App package identity confirmed | Confirmed by successful CI sparse-package registration; target Windows machine not tested |
+| Capability present in installed package | Confirmed by CI inspection of the installed package manifest; target Windows machine not tested |
 | Permission prompt shown | Not tested yet |
 | Allow / deny / revoke scenarios | Not tested yet |
 | Existing and incoming notifications | Not tested yet |
 | Known limitations | Pending Windows runtime validation |
 
-A successful `dotnet build` or CI publish is **not** evidence that notification access works. Phase 3 remains unverified until this checklist is executed on Windows and the observed results are recorded.
+Latest automated package validation: [workflow run](https://github.com/Suushian/Glass-Island/actions/runs/40096173546). CI successfully built the sparse MSIX, registered it on Windows Server 2025, and verified the installed manifest contains `userNotificationListener`.
+
+A successful build or package-registration smoke test is **not** evidence that the interactive permission prompt or real notification enumeration works. Phase 3 remains unverified until the runtime checklist is executed on the target Windows machine and the observed results are recorded.
