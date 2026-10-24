@@ -174,22 +174,33 @@ public sealed class NotificationService : IDisposable
 
             foreach (var notification in notifications)
             {
-                var binding = notification.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
-                var textElements = binding?.GetTextElements();
-                var texts = textElements?
-                    .Select(element => element.Text?.Trim())
-                    .Where(text => !string.IsNullOrWhiteSpace(text))
-                    .Cast<string>()
-                    .ToArray() ?? Array.Empty<string>();
+                var appName = "An app";
+                var title = "Notification";
+                var body = string.Empty;
 
-                var appName = notification.AppInfo?.DisplayInfo?.DisplayName;
-                if (string.IsNullOrWhiteSpace(appName))
+                try
                 {
-                    appName = "An app";
-                }
+                    var binding = notification.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
+                    var textElements = binding?.GetTextElements();
+                    var texts = textElements?
+                        .Select(element => element.Text?.Trim())
+                        .Where(text => !string.IsNullOrWhiteSpace(text))
+                        .Cast<string>()
+                        .ToArray() ?? Array.Empty<string>();
 
-                var title = texts.FirstOrDefault() ?? "Notification";
-                var body = texts.Length > 1 ? string.Join(Environment.NewLine, texts.Skip(1)) : string.Empty;
+                    var displayName = notification.AppInfo?.DisplayInfo?.DisplayName;
+                    if (!string.IsNullOrWhiteSpace(displayName))
+                    {
+                        appName = displayName;
+                    }
+
+                    title = texts.FirstOrDefault() ?? "Notification";
+                    body = texts.Length > 1 ? string.Join(Environment.NewLine, texts.Skip(1)) : string.Empty;
+                }
+                catch
+                {
+                    // Preserve a safe fallback for this item without dropping other notifications.
+                }
 
                 items.Add(new NotificationItem(
                     notification.Id,
@@ -249,6 +260,7 @@ public sealed class NotificationService : IDisposable
             _listener = null;
         }
 
+        Current = new(false, "Notifications are disconnected.", Array.Empty<NotificationItem>());
         StateChanged = null;
     }
 }
