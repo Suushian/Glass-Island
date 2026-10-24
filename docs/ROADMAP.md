@@ -43,7 +43,7 @@ The notification-listener proof of concept and system audio/volume controls have
 - [x] Unused NAudio dependency is removed.
 - [x] Product, UX, architecture, security, test, and build docs describe media-only scope.
 - [x] Notification-specific POC and package-identity runbooks are removed.
-- [ ] Windows Release build and self-contained x64 publish pass.
+- [x] Windows Release build and self-contained x64 publish pass (CI run 40097735812).
 
 ## Milestone 3 — quality and accessibility
 
