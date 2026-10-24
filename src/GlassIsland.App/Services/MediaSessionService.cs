@@ -216,6 +216,7 @@ public sealed class MediaSessionService : IAsyncDisposable
                 artist = NormalizeMetadata(properties.AlbumArtist);
             }
 
+            var hasTrackTitle = title is not null;
             if (title is null)
             {
                 var sourceName = GetSourceDisplayName(session.SourceAppUserModelId);
@@ -224,7 +225,7 @@ public sealed class MediaSessionService : IAsyncDisposable
 
             if (artist is null)
             {
-                artist = "اطلاعات آهنگ ارائه نشده";
+                artist = hasTrackTitle ? "هنرمند ارائه نشده" : "اطلاعات آهنگ ارائه نشده";
             }
 
             Publish(new MediaSnapshot(
@@ -260,6 +261,8 @@ public sealed class MediaSessionService : IAsyncDisposable
             "unknown artist",
             "unknown title",
             "unknown track",
+            "unknown album artist",
+            "unknown performer",
             "n/a",
             "not available",
             "نامشخص",
