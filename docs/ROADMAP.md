@@ -39,11 +39,17 @@
 
 **Limitation:** GSMTC only provides metadata published by the media player. The fallback improves the UI state but cannot infer the real track title when a player does not publish it.
 
-## Milestone 3 — notification proof-of-concept
-- Validate documented APIs, permissions, supported OS versions, and feasible scenarios.
-- Record API decision/limitations before building UX.
-- Add privacy controls and integration tests only for supported behavior.
-**Exit:** no unsupported access techniques; graceful unavailable state; no notification content in logs.
+## Milestone 3 — notification proof-of-concept (Phase 3)
+- [x] Review Microsoft's documented notification-listener API, permission flow, capability declaration, and supported notification types.
+- [x] Record the packaging/capability dependency and privacy constraints before implementing notification UX.
+- [ ] Establish package identity and declare `userNotificationListener` in a test package; validate on a real Windows installation.
+- [ ] Request access on the UI thread and verify Allowed, Denied, and Unspecified/revoked states.
+- [ ] Verify notification enumeration/change events, source app metadata, and graceful behavior when no access or no notifications are available.
+- [ ] Confirm privacy-by-default behavior: no notification text in logs, no unnecessary persistence, and previews disabled until explicit opt-in.
+- [ ] Add automated coverage for state mapping and lifecycle; document Windows integration results.
+**Exit:** a real Windows test demonstrates the supported access path and permission behavior; limitations and package requirements are documented; no unsupported access techniques and no notification content in logs.
+
+**Phase 3 discovery status:** API research and constraints are recorded in [`docs/PHASE-3-NOTIFICATIONS-POC.md`](PHASE-3-NOTIFICATIONS-POC.md). This is not yet a runtime proof: the current CI artifact is a self-contained executable, while the documented listener requires the `userNotificationListener` package capability and explicit user permission.
 
 ## Milestone 4 — startup and settings
 Opt-in per-user launch, reliable cleanup, start collapsed, reduced-motion/privacy settings, safe persistence defaults.
