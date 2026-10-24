@@ -61,7 +61,7 @@ public partial class MainWindow : Window
         _audioService.Initialize();
         await _mediaService.InitializeAsync();
         await _notificationService.InitializeAsync(() =>
-            MessageBox.Show(
+            System.Windows.MessageBox.Show(
                 this,
                 "Glass Island can bring your notifications together in one place. Windows will ask whether you want to allow access. You can change this permission later in Windows Settings.",
                 "Connect your notifications",
