@@ -42,14 +42,15 @@
 ## Milestone 3 — notification proof-of-concept (Phase 3)
 - [x] Review Microsoft's documented notification-listener API, permission flow, capability declaration, and supported notification types.
 - [x] Record the packaging/capability dependency and privacy constraints before implementing notification UX.
+- [x] Add the first listener adapter and an English, scrollable notification list UI; this is code-level work only, not proof that Windows access works.
 - [ ] Establish package identity and declare `userNotificationListener` in a test package; validate on a real Windows installation.
-- [ ] Request access on the UI thread and verify Allowed, Denied, and Unspecified/revoked states.
-- [ ] Verify notification enumeration/change events, source app metadata, and graceful behavior when no access or no notifications are available.
+- [ ] Validate the first-run access request on the UI thread and verify Allowed, Denied, and Unspecified/revoked states on a packaged Windows installation.
+- [ ] Verify notification enumeration/change events, source app metadata, and graceful behavior when no access or no notifications are available on a packaged Windows installation.
 - [ ] Confirm privacy safeguards: no notification text in logs, no unnecessary persistence, and a clear English explanation before the Windows permission prompt.
 - [ ] Add automated coverage for state mapping and lifecycle; document Windows integration results.
 **Exit:** a real Windows test demonstrates the supported access path and permission behavior; limitations and package requirements are documented; no unsupported access techniques and no notification content in logs.
 
-**Phase 3 status:** API research is recorded in [`docs/PHASE-3-NOTIFICATIONS-POC.md`](PHASE-3-NOTIFICATIONS-POC.md), and the existing UI is being aligned to an English-only, friendly conversational voice. This is not yet a runtime proof: the current CI artifact is a self-contained executable, while the documented listener requires the `userNotificationListener` package capability and explicit user permission. Notification behavior remains unverified until the packaged runtime is tested on Windows.
+**Phase 3 status:** The first listener adapter and scrollable notification list are implemented, and in-app copy is English-only with a friendly conversational voice. This is not yet a runtime proof: the current CI artifact is a self-contained executable, while the documented listener requires the `userNotificationListener` package capability and explicit user permission. Notification behavior remains unverified until the packaged runtime is tested on Windows.
 
 ## Milestone 4 — startup and settings
 Opt-in per-user launch, reliable cleanup, start collapsed, reduced-motion/privacy settings, safe persistence defaults.
