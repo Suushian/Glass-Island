@@ -35,14 +35,27 @@ This is a locally signed development test package, not a production release. It 
 
 ## Unregister and clean up
 
-In elevated PowerShell from the same folder:
+First inspect the installed package in elevated PowerShell:
 
 ```powershell
-Get-AppxPackage | Where-Object { $_.InstallLocation -eq (Get-Location).Path } | Remove-AppxPackage
-Remove-Item Cert:\LocalMachine\TrustedPeople\* -ErrorAction SilentlyContinue
+Get-AppxPackage | Where-Object { $_.Name -like '*GlassIsland*' } | Format-Table Name, PackageFullName, InstallLocation
 ```
 
-**Important:** Do not run the broad certificate removal command above on a machine with other trusted certificates. Identify the specific GlassIsland development certificate by its subject/thumbprint and remove only that certificate. The package removal query can also vary depending on how Windows reports the sparse package install location; inspect `Get-AppxPackage` before removal.
+Remove only the package entry you have identified as this test installation. The reported install location for a sparse package may vary, so do not pipe a broad package query directly into `Remove-AppxPackage` without checking the result first.
+
+To identify the development certificate:
+
+```powershell
+Get-ChildItem Cert:\\LocalMachine\\TrustedPeople | Where-Object { $_.Subject -like '*GlassIsland*' } | Format-Table Subject, Thumbprint, NotAfter
+```
+
+After verifying the exact certificate thumbprint, remove only that certificate:
+
+```powershell
+Remove-Item "Cert:\\LocalMachine\\TrustedPeople\\<THUMBPRINT>"
+```
+
+Do not remove all certificates from the Trusted People store; other applications may rely on them.
 
 ## What CI can and cannot prove
 
