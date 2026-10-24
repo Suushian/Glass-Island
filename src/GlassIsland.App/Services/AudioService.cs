@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 
@@ -39,11 +40,19 @@ public sealed class AudioService : IDisposable
             {
                 _enumerator = new MMDeviceEnumerator();
                 _notificationClient = new EndpointNotificationClient(this);
-                _enumerator.RegisterEndpointNotificationCallback(_notificationClient);
+                Marshal.ThrowExceptionForHR(_enumerator.RegisterEndpointNotificationCallback(_notificationClient));
             }
             catch
             {
-                _enumerator?.Dispose();
+                try
+                {
+                    _enumerator?.Dispose();
+                }
+                catch
+                {
+                    // Initialization failure must leave the shell usable.
+                }
+
                 _enumerator = null;
                 _notificationClient = null;
                 PublishUnavailable("دسترسی به خروجی صدای ویندوز در دسترس نیست");
@@ -166,7 +175,8 @@ public sealed class AudioService : IDisposable
             }
             catch
             {
-                next?.Dispose();
+                DisposeDevice(next);
+                next = null;
                 previous = _device;
                 _device = null;
                 snapshot = new AudioSnapshot(false, 0, false,
@@ -279,7 +289,7 @@ public sealed class AudioService : IDisposable
             {
                 if (notificationClient is not null)
                 {
-                    enumerator.UnregisterEndpointNotificationCallback(notificationClient);
+                    Marshal.ThrowExceptionForHR(enumerator.UnregisterEndpointNotificationCallback(notificationClient));
                 }
             }
             catch
