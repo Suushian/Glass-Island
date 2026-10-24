@@ -31,9 +31,11 @@ Official references:
 
 The Windows App SDK `Microsoft.Windows.AppNotifications` APIs primarily let GlassIsland **send its own app notifications**; they are not a substitute for reading notifications from other applications. The listener API is the relevant candidate for the intended feature.
 
-### Packaging gate
+### Implementation status and packaging gate
 
-The documented listener flow requires the `userNotificationListener` capability in an app package manifest and explicit user permission. The current self-contained EXE artifact alone does not declare that package capability. Therefore, calling the API from the current unpackaged artifact is not sufficient evidence that the feature is supported.
+A first code-level implementation now exists: `NotificationService` requests Windows access when the API reports `Unspecified`, enumerates supported toast notifications, listens for foreground notification changes, and exposes app name, timestamp, title, and body to the WPF UI. The expanded island includes a scrollable notification list. User-facing app text has been standardized on English with a friendly, conversational voice.
+
+The documented listener flow requires the `userNotificationListener` capability in an app package manifest and explicit user permission. The current self-contained EXE artifact alone does not declare that package capability. Therefore, this code is not yet a working end-to-end feature: the unpackaged app may fail before Windows can show its permission prompt. A package-identity test route and real Windows validation remain mandatory.
 
 Before implementing the user-facing notification panel, create a minimal package-identity/MSIX test path or another Microsoft-documented packaging arrangement that can declare the capability. Do not add the capability or packaging machinery to the production app without verifying the actual build and install flow on Windows.
 
@@ -74,4 +76,4 @@ Before implementing the user-facing notification panel, create a minimal package
 
 ## Decision
 
-**Do not claim notification access is working until the packaged runtime proof passes.** Build a package that declares the required capability and verify the listener on Windows before enabling the feature by default. If the runtime test fails or distribution constraints make this access model unsuitable, revisit the feature scope. The product-facing language must remain English and conversational throughout.
+**Do not claim notification access is working until the packaged runtime proof passes.** The listener adapter and notification list are implemented, but the feature remains unverified. Build a package that declares the required capability and verify the permission flow and notifications on Windows before marking Phase 3 complete. If the runtime test fails or distribution constraints make this access model unsuitable, revisit the feature scope. The product-facing language must remain English and conversational throughout.
