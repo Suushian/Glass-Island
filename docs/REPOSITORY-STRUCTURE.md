@@ -15,12 +15,15 @@ GlassIsland/
 │       ├── App.xaml.cs
 │       ├── MainWindow.xaml
 │       ├── MainWindow.xaml.cs
+│       ├── Services/
+│       │   ├── MediaSessionService.cs
+│       │   └── AudioService.cs
 │       ├── app.manifest
 │       └── GlassIsland.App.csproj
 └── .github/workflows/windows-build.yml
 ```
 
-This is the current first-stage implementation. Media/audio adapters, notification proof-of-concept, automated tests, and packaging projects are not present yet.
+The Phase 2 branch adds `MediaSessionService` and `AudioService` under the app project. Notification proof-of-concept, automated regression tests, and packaging projects are still not present.
 
 ## Planned responsibilities
 
