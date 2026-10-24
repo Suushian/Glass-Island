@@ -4,7 +4,7 @@
 
 GlassIsland is a Windows desktop utility with a compact floating surface near the top-center of the display. The MVP target is a minimal, smoothly animated shell with controls for the active supported media session, system output volume, and Windows notifications where documented APIs and permissions allow them.
 
-> **Current status:** Phase 1 and Phase 2 are merged into `main`. Phase 2 provides Windows media-session metadata and transport controls, plus default output volume/mute controls. The latest Windows CI build and self-contained x64 Debug publish passed in [run 40092533594](https://github.com/Suushian/Glass-Island/actions/runs/40092533594), and the user confirmed the Windows build works, including correct Telegram track title and artist display. Notifications remain Phase 3. See the [roadmap](docs/ROADMAP.md).
+> **Current status:** Phase 1 and Phase 2 are merged into `main`. Phase 2 provides Windows media-session metadata and transport controls, plus default output volume/mute controls. The latest Windows CI build and self-contained x64 Debug publish passed in [run 40092533594](https://github.com/Suushian/Glass-Island/actions/runs/40092533594), and the user confirmed the Windows build works, including correct Telegram track title and artist display. Phase 3 has started with notification API/permission research; a runtime proof-of-concept is still pending package identity and capability validation. See the [roadmap](docs/ROADMAP.md) and [Phase 3 notification POC](docs/PHASE-3-NOTIFICATIONS-POC.md).
 
 ## Run locally
 
