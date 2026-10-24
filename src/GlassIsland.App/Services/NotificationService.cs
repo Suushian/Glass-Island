@@ -97,6 +97,53 @@ public sealed class NotificationService : IDisposable
         await RefreshAsync();
     }
 
+    /// <summary>
+    /// Re-checks the permission state without polling notification contents.
+    /// This lets the UI clear previously displayed notification text after access is revoked.
+    /// </summary>
+    public async Task CheckAccessStatusAsync()
+    {
+        var listener = _listener;
+        if (_disposed || listener is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var access = listener.GetAccessStatus();
+            if (access != UserNotificationListenerAccessStatus.Allowed)
+            {
+                Publish(new NotificationSnapshot(
+                    false,
+                    access == UserNotificationListenerAccessStatus.Denied
+                        ? "Notification access is off. You can turn it on in Windows Settings."
+                        : "Windows hasn't granted notification access yet.",
+                    Array.Empty<NotificationItem>()));
+                return;
+            }
+
+            if (!Current.HasAccess)
+            {
+                await RefreshAsync();
+            }
+        }
+        catch (COMException)
+        {
+            Publish(new NotificationSnapshot(
+                false,
+                "Notification access is unavailable. Check Windows Settings.",
+                Array.Empty<NotificationItem>()));
+        }
+        catch
+        {
+            Publish(new NotificationSnapshot(
+                false,
+                "We couldn't check notification access just now.",
+                Array.Empty<NotificationItem>()));
+        }
+    }
+
     private async Task RefreshAsync()
     {
         var listener = _listener;
@@ -127,22 +174,33 @@ public sealed class NotificationService : IDisposable
 
             foreach (var notification in notifications)
             {
-                var binding = notification.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
-                var textElements = binding?.GetTextElements();
-                var texts = textElements?
-                    .Select(element => element.Text?.Trim())
-                    .Where(text => !string.IsNullOrWhiteSpace(text))
-                    .Cast<string>()
-                    .ToArray() ?? Array.Empty<string>();
+                var appName = "An app";
+                var title = "Notification";
+                var body = string.Empty;
 
-                var appName = notification.AppInfo?.DisplayInfo?.DisplayName;
-                if (string.IsNullOrWhiteSpace(appName))
+                try
                 {
-                    appName = "An app";
-                }
+                    var binding = notification.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
+                    var textElements = binding?.GetTextElements();
+                    var texts = textElements?
+                        .Select(element => element.Text?.Trim())
+                        .Where(text => !string.IsNullOrWhiteSpace(text))
+                        .Cast<string>()
+                        .ToArray() ?? Array.Empty<string>();
 
-                var title = texts.FirstOrDefault() ?? "Notification";
-                var body = texts.Length > 1 ? string.Join(Environment.NewLine, texts.Skip(1)) : string.Empty;
+                    var displayName = notification.AppInfo?.DisplayInfo?.DisplayName;
+                    if (!string.IsNullOrWhiteSpace(displayName))
+                    {
+                        appName = displayName;
+                    }
+
+                    title = texts.FirstOrDefault() ?? "Notification";
+                    body = texts.Length > 1 ? string.Join(Environment.NewLine, texts.Skip(1)) : string.Empty;
+                }
+                catch
+                {
+                    // Preserve a safe fallback for this item without dropping other notifications.
+                }
 
                 items.Add(new NotificationItem(
                     notification.Id,
@@ -202,6 +260,7 @@ public sealed class NotificationService : IDisposable
             _listener = null;
         }
 
+        Current = new(false, "Notifications are disconnected.", Array.Empty<NotificationItem>());
         StateChanged = null;
     }
 }
