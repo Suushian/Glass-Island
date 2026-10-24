@@ -45,11 +45,11 @@
 - [ ] Establish package identity and declare `userNotificationListener` in a test package; validate on a real Windows installation.
 - [ ] Request access on the UI thread and verify Allowed, Denied, and Unspecified/revoked states.
 - [ ] Verify notification enumeration/change events, source app metadata, and graceful behavior when no access or no notifications are available.
-- [ ] Confirm privacy-by-default behavior: no notification text in logs, no unnecessary persistence, and previews disabled until explicit opt-in.
+- [ ] Confirm privacy safeguards: no notification text in logs, no unnecessary persistence, and a clear English explanation before the Windows permission prompt.
 - [ ] Add automated coverage for state mapping and lifecycle; document Windows integration results.
 **Exit:** a real Windows test demonstrates the supported access path and permission behavior; limitations and package requirements are documented; no unsupported access techniques and no notification content in logs.
 
-**Phase 3 discovery status:** API research and constraints are recorded in [`docs/PHASE-3-NOTIFICATIONS-POC.md`](PHASE-3-NOTIFICATIONS-POC.md). This is not yet a runtime proof: the current CI artifact is a self-contained executable, while the documented listener requires the `userNotificationListener` package capability and explicit user permission.
+**Phase 3 status:** API research is recorded in [`docs/PHASE-3-NOTIFICATIONS-POC.md`](PHASE-3-NOTIFICATIONS-POC.md), and the existing UI is being aligned to an English-only, friendly conversational voice. This is not yet a runtime proof: the current CI artifact is a self-contained executable, while the documented listener requires the `userNotificationListener` package capability and explicit user permission. Notification behavior remains unverified until the packaged runtime is tested on Windows.
 
 ## Milestone 4 — startup and settings
 Opt-in per-user launch, reliable cleanup, start collapsed, reduced-motion/privacy settings, safe persistence defaults.
