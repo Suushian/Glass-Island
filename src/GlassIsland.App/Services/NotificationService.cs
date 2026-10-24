@@ -37,7 +37,7 @@ public sealed class NotificationService : IDisposable
     public NotificationSnapshot Current { get; private set; } =
         new(false, "Notifications aren't connected yet.", Array.Empty<NotificationItem>());
 
-    public async Task InitializeAsync()
+    public async Task InitializeAsync(Action? beforeAccessRequest = null)
     {
         if (_disposed)
         {
@@ -51,6 +51,10 @@ public sealed class NotificationService : IDisposable
 
             if (access == UserNotificationListenerAccessStatus.Unspecified)
             {
+                // Explain the request before Windows shows its system permission dialog.
+                // This is informational only; Windows remains the sole permission gate.
+                beforeAccessRequest?.Invoke();
+
                 // This method is called by the WPF window on its UI thread. Windows requires
                 // RequestAccessAsync to be invoked from the UI thread.
                 access = await _listener.RequestAccessAsync();
