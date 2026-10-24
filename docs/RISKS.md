@@ -6,6 +6,7 @@
 | Notification access unavailable for desired scenarios | High | High | Early API/permission proof-of-concept; redesign scope if unsupported |
 | Media session metadata varies by player | Medium | Medium | Fallback UI and player/session matrix |
 | Core Audio COM lifecycle bugs | Medium | High | Narrow adapter boundary, deterministic cleanup, integration tests |
+| Media/audio adapter behavior differs by player or endpoint | Medium | Medium | Test supported players, missing metadata, external volume changes, device switches, and shutdown on Windows |
 | DPI/monitor changes move island off-screen | Medium | Medium | Recalculate placement and test display combinations |
 | Startup registration remains after disable/uninstall | Medium | Medium | Centralized registration and cleanup tests |
 | Always-on-top overlay obstructs full-screen apps | Medium | Medium | Define full-screen policy and hide behavior |
