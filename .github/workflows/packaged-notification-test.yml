@@ -25,7 +25,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Set up WinApp CLI
-        uses: microsoft/setup-winapp@v0.1
+        uses: microsoft/setup-WinAppCli@v0.1
 
       - name: Restore
         run: dotnet restore .\GlassIsland.sln
