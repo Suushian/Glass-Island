@@ -30,10 +30,10 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         _trayMenu = new Forms.ContextMenuStrip();
-        _trayMenu.Items.Add("نمایش GlassIsland", null, (_, _) => ShowFromTray());
-        _trayMenu.Items.Add("مخفی‌کردن", null, (_, _) => Hide());
+        _trayMenu.Items.Add("Show GlassIsland", null, (_, _) => ShowFromTray());
+        _trayMenu.Items.Add("Hide", null, (_, _) => Hide());
         _trayMenu.Items.Add(new Forms.ToolStripSeparator());
-        _trayMenu.Items.Add("خروج", null, (_, _) => ExitApplication());
+        _trayMenu.Items.Add("Quit GlassIsland", null, (_, _) => ExitApplication());
 
         _trayIcon = new Forms.NotifyIcon
         {
@@ -122,7 +122,7 @@ public partial class MainWindow : Window
 
         AudioVolumeSlider.IsEnabled = snapshot.IsAvailable;
         AudioMuteButton.IsEnabled = snapshot.IsAvailable;
-        AudioMuteButton.Content = snapshot.IsMuted ? "فعال‌کردن صدا" : "قطع صدا";
+        AudioMuteButton.Content = snapshot.IsMuted ? "Unmute" : "Mute";
         AudioDeviceText.Text = snapshot.IsAvailable ? snapshot.DeviceName : snapshot.Status;
     }
 
