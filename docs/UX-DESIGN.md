@@ -5,7 +5,9 @@ A compact dark-glass surface with restrained highlights. Readability and idle ef
 
 ## Interaction
 - **Collapsed:** small horizontal capsule near the top-center of the selected display; show only the most relevant active state.
-- **Expanded:** media controls, volume, and supported notification previews in clear sections.
+- **Expanded:** media controls, volume, and supported notifications in clear sections.
+- **Language and voice:** the entire in-app experience is English. Use friendly, conversational microcopy with short, natural phrases; keep permission, privacy, and error explanations precise rather than jokey.
+- **First launch:** explain why notification access is useful, then ask Windows for permission. After permission is granted, show supported notifications from all apps that Windows exposes, including existing and incoming notifications.
 - Passive updates must not steal focus.
 - Pointer and keyboard can expand/collapse the island.
 - Clicking outside may collapse it, but must not interrupt an active control interaction.
@@ -36,7 +38,7 @@ These are starting values, not validated design specifications. Maintain an opaq
 - Keep pointer targets reliably usable.
 
 ## Notification privacy
-Notification content can expose messages and one-time codes. Offer previews off by default or require explicit opt-in before displaying message text. Consider app-only previews, configurable expiry, and hiding previews while a full-screen app is active if reliably detectable. Do not log preview content.
+Notification content can expose messages and one-time codes. Windows permission is the explicit consent gate for Phase 3; once granted, the app should display supported notification content without a second hidden opt-in. Never log or persist notification content. Consider later controls for hiding previews, app-specific filtering, configurable expiry, and hiding previews while a full-screen app is active if reliably detectable.
 
 ## Acceptance checks
 Readable over varied wallpapers; no focus stealing; no clipping at supported DPI/text scaling; no off-screen placement after monitor changes; idle animations stop; expanded controls remain keyboard-accessible.
