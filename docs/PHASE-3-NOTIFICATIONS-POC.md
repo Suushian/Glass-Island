@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Implement the Phase 3 notification behavior through a documented, permission-compatible Windows API. On first launch, GlassIsland explains why access is needed and requests the Windows notification permission. After permission is granted, it displays all supported notifications exposed by Windows from any app, including notifications already present and notifications arriving while GlassIsland is running. This document records API research and the test gate; runtime access has not yet been proven.
+Implement the Phase 3 notification behavior through a documented, permission-compatible Windows API. The entire in-app experience must be English, with friendly, conversational microcopy that stays clear and respectful. On first launch, GlassIsland briefly explains why notification access is needed and requests Windows permission. After permission is granted, it displays supported notifications exposed by Windows from any app, including notifications already present and notifications arriving while GlassIsland is running. Windows permission is the consent gate; do not add a second in-app opt-in that silently blocks notification display. This document records API research and the test gate; runtime access has not yet been proven.
 
 ## Current application constraints
 
@@ -41,7 +41,8 @@ Before implementing the user-facing notification panel, create a minimal package
 
 - No notification text, title, one-time code, or message body in logs, exceptions, telemetry, or crash diagnostics.
 - Do not persist notification contents. Keep any proof-of-concept data in memory and only as long as needed to validate the API.
-- After Windows permission is granted, show the notification information that the API exposes and that Windows makes available, including app name, timestamp, title, and body where present. Do not add a second in-app permission gate that prevents the requested notification display.
+- After Windows permission is granted, show the notification information that the API exposes and Windows makes available, including app name, timestamp, title, and body where present. Do not add a second in-app permission gate that prevents notification display.
+- All user-facing strings, accessibility labels, tray menu items, errors, and empty states must be English. Prefer friendly, natural copy such as “All set”, “Nothing playing right now”, and “Your notifications will show up here”. Avoid slang that obscures permission or failure states.
 - Do not dismiss or clear notifications in the proof-of-concept; that is destructive and not needed to prove read access.
 - If access is denied, revoked, unsupported, or unavailable, leave the shell operational and report a clear non-repeating status.
 - Never scrape private notification databases, inject into other processes, or bypass permission controls.
@@ -50,7 +51,7 @@ Before implementing the user-facing notification panel, create a minimal package
 
 | Scenario | Expected result |
 |---|---|
-| First run, access not yet decided | Explain why access is needed, then request Windows permission on the UI thread; do not read/display notification content before permission is granted |
+| First run, access not yet decided | In friendly English, explain why access is needed, then request Windows permission on the UI thread; do not read/display notification content before permission is granted |
 | User allows access | Access status is Allowed; enumerate and display supported existing toast notifications from all apps, then reflect incoming changes |
 | User denies access | Clear unavailable/permission-required state; no retry loop |
 | User later revokes access | Detect/check status and stop exposing notification data |
@@ -73,4 +74,4 @@ Before implementing the user-facing notification panel, create a minimal package
 
 ## Decision
 
-**Do not implement full notification UX yet.** First prove the documented listener API through a package that declares the required capability. If the packaged runtime test fails or the distribution constraints make this access model unsuitable, revisit the feature scope before adding UI.
+**Do not claim notification access is working until the packaged runtime proof passes.** Build a package that declares the required capability and verify the listener on Windows before enabling the feature by default. If the runtime test fails or distribution constraints make this access model unsuitable, revisit the feature scope. The product-facing language must remain English and conversational throughout.
