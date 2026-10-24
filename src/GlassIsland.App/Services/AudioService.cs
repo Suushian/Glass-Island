@@ -237,7 +237,7 @@ public sealed class AudioService : IDisposable
         {
             if (ReferenceEquals(Volatile.Read(ref _device), device))
             {
-                PublishUnavailable("وضعیت No audio output available");
+                PublishUnavailable("Audio output status is unavailable");
             }
         }
     }
