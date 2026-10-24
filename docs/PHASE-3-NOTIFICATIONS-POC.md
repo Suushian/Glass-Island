@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Implement the Phase 3 notification behavior through a documented, permission-compatible Windows API. The entire in-app experience must be English, with friendly, conversational microcopy that stays clear and respectful. On first launch, GlassIsland briefly explains why notification access is needed and requests Windows permission. After permission is granted, it displays supported notifications exposed by Windows from any app, including notifications already present and notifications arriving while GlassIsland is running. Windows permission is the consent gate; do not add a second in-app opt-in that silently blocks notification display. This document records API research and the test gate; runtime access has not yet been proven.
+Implement the Phase 3 notification behavior through a documented, permission-compatible Windows API. The entire in-app experience must be English, with friendly, conversational microcopy that stays clear and respectful. On first launch, GlassIsland briefly explains why notification access is needed and requests Windows permission. After permission is granted, it displays supported notifications exposed by Windows from any app, including notifications already present and notifications arriving while GlassIsland is running. Windows permission is the consent gate; do not add a second in-app opt-in that silently blocks notification display. Runtime access has not yet been proven.
 
 ## Current application constraints
 
@@ -31,13 +31,13 @@ Official references:
 
 The Windows App SDK `Microsoft.Windows.AppNotifications` APIs primarily let GlassIsland **send its own app notifications**; they are not a substitute for reading notifications from other applications. The listener API is the relevant candidate for the intended feature.
 
-### Implementation status and packaging gate
+## Implementation status and packaging gate
 
 A first code-level implementation now exists: `NotificationService` requests Windows access when the API reports `Unspecified`, enumerates supported toast notifications, listens for foreground notification changes, and exposes app name, timestamp, title, and body to the WPF UI. The expanded island includes a scrollable notification list. User-facing app text has been standardized on English with a friendly, conversational voice.
 
 The documented listener flow requires the `userNotificationListener` capability in an app package manifest and explicit user permission. The current self-contained EXE artifact alone does not declare that package capability. Therefore, this code is not yet a working end-to-end feature: the unpackaged app may fail before Windows can show its permission prompt. A package-identity test route and real Windows validation remain mandatory.
 
-Before implementing the user-facing notification panel, create a minimal package-identity/MSIX test path or another Microsoft-documented packaging arrangement that can declare the capability. Do not add the capability or packaging machinery to the production app without verifying the actual build and install flow on Windows.
+The next step is to follow the separate [Phase 3 package-identity test runbook](PHASE-3-PACKAGE-IDENTITY-TEST.md). It uses Microsoft's WinApp CLI guidance as a test route, and explicitly requires a disposable checkout because project initialization may change the target framework or project configuration. Do not add packaging machinery to the normal build until the identity-enabled run and install flow has been verified on Windows.
 
 ## Privacy and scope rules
 
