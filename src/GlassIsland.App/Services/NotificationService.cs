@@ -97,6 +97,53 @@ public sealed class NotificationService : IDisposable
         await RefreshAsync();
     }
 
+    /// <summary>
+    /// Re-checks the permission state without polling notification contents.
+    /// This lets the UI clear previously displayed notification text after access is revoked.
+    /// </summary>
+    public async Task CheckAccessStatusAsync()
+    {
+        var listener = _listener;
+        if (_disposed || listener is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var access = listener.GetAccessStatus();
+            if (access != UserNotificationListenerAccessStatus.Allowed)
+            {
+                Publish(new NotificationSnapshot(
+                    false,
+                    access == UserNotificationListenerAccessStatus.Denied
+                        ? "Notification access is off. You can turn it on in Windows Settings."
+                        : "Windows hasn't granted notification access yet.",
+                    Array.Empty<NotificationItem>()));
+                return;
+            }
+
+            if (!Current.HasAccess)
+            {
+                await RefreshAsync();
+            }
+        }
+        catch (COMException)
+        {
+            Publish(new NotificationSnapshot(
+                false,
+                "Notification access is unavailable. Check Windows Settings.",
+                Array.Empty<NotificationItem>()));
+        }
+        catch
+        {
+            Publish(new NotificationSnapshot(
+                false,
+                "We couldn't check notification access just now.",
+                Array.Empty<NotificationItem>()));
+        }
+    }
+
     private async Task RefreshAsync()
     {
         var listener = _listener;
