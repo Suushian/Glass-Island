@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Determine whether GlassIsland can display Windows notifications from other applications through a documented, permission-compatible API before building notification UI. This document records API research and the test gate; it does not claim runtime access has been proven.
+Implement the Phase 3 notification behavior through a documented, permission-compatible Windows API. On first launch, GlassIsland explains why access is needed and requests the Windows notification permission. After permission is granted, it displays all supported notifications exposed by Windows from any app, including notifications already present and notifications arriving while GlassIsland is running. This document records API research and the test gate; runtime access has not yet been proven.
 
 ## Current application constraints
 
@@ -19,7 +19,7 @@ Microsoft documents this API for reading and managing notifications, including n
 1. Declare the `userNotificationListener` capability in the app package manifest.
 2. Explain the reason for access to the user, then call `RequestAccessAsync` from the UI thread.
 3. Handle `Allowed`, `Denied`, and `Unspecified`; re-check `GetAccessStatus()` because permission can later be revoked in Windows Settings.
-4. Enumerate supported app toast notifications with `GetNotificationsAsync(NotificationKinds.Toast)` and observe notification changes where supported.
+4. Enumerate supported app toast notifications with `GetNotificationsAsync(NotificationKinds.Toast)` and observe notification changes so existing and newly arriving notifications from any app are reflected in GlassIsland.
 5. Treat empty results as ambiguous unless access status is checked: an empty collection may mean no notifications or that access is no longer available.
 
 Official references:
@@ -41,8 +41,7 @@ Before implementing the user-facing notification panel, create a minimal package
 
 - No notification text, title, one-time code, or message body in logs, exceptions, telemetry, or crash diagnostics.
 - Do not persist notification contents. Keep any proof-of-concept data in memory and only as long as needed to validate the API.
-- Notification previews must remain off by default until the user explicitly opts in.
-- Start with app name, timestamp, and a bounded preview only if the API provides it and the user has opted in.
+- After Windows permission is granted, show the notification information that the API exposes and that Windows makes available, including app name, timestamp, title, and body where present. Do not add a second in-app permission gate that prevents the requested notification display.
 - Do not dismiss or clear notifications in the proof-of-concept; that is destructive and not needed to prove read access.
 - If access is denied, revoked, unsupported, or unavailable, leave the shell operational and report a clear non-repeating status.
 - Never scrape private notification databases, inject into other processes, or bypass permission controls.
@@ -51,12 +50,12 @@ Before implementing the user-facing notification panel, create a minimal package
 
 | Scenario | Expected result |
 |---|---|
-| First run, access not yet decided | Explain why access is needed, then request permission on the UI thread |
-| User allows access | Access status is Allowed; supported toast notifications can be enumerated |
+| First run, access not yet decided | Explain why access is needed, then request Windows permission on the UI thread; do not read/display notification content before permission is granted |
+| User allows access | Access status is Allowed; enumerate and display supported existing toast notifications from all apps, then reflect incoming changes |
 | User denies access | Clear unavailable/permission-required state; no retry loop |
 | User later revokes access | Detect/check status and stop exposing notification data |
 | No notifications exist | Empty state, not an exception or fabricated content |
-| A notification is added/dismissed | Listener change is handled without crashing; UI work is dispatched correctly |
+| A notification is added/dismissed | Listener change is handled without crashing; additions/removals are reflected in the UI and UI work is dispatched correctly |
 | Notification has missing or malformed fields | Safe bounded fallback; no raw content logged |
 | App exits during a callback | Event handlers and resources are released |
 | Package capability or API is unsupported | Explicit unavailable state; shell and media/audio continue working |
@@ -64,6 +63,8 @@ Before implementing the user-facing notification panel, create a minimal package
 ## Exit criteria
 
 - [ ] A Windows-installed test package declares the capability correctly.
+- [ ] On first launch, Windows permission is requested and the result is handled correctly.
+- [ ] Existing supported notifications from all apps and incoming notifications are displayed after access is granted.
 - [ ] Real runtime results are recorded for allowed, denied, revoked, and empty states.
 - [ ] Notification change handling and shutdown cleanup are verified.
 - [ ] Automated tests cover permission-state mapping, fallback behavior, and data minimization where practical.
