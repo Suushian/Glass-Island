@@ -1,0 +1,144 @@
+name: Windows packaged notification test
+
+on:
+  push:
+    branches:
+      - "feat/phase-3-packaged-notification-test"
+  pull_request:
+    branches:
+      - "feat/phase-3-notification-poc"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-identity-test:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Set up WinApp CLI
+        uses: microsoft/setup-winapp@v0.1
+
+      - name: Restore
+        run: dotnet restore .\GlassIsland.sln
+
+      - name: Build and publish Windows x64 test executable
+        shell: pwsh
+        run: |
+          dotnet publish .\src\GlassIsland.App\GlassIsland.App.csproj `
+            --configuration Debug `
+            --runtime win-x64 `
+            --self-contained true `
+            --output .\artifacts\GlassIsland-Packaged-Test `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:IncludeAllContentForSelfExtract=true `
+            -p:DebugType=portable
+
+      - name: Generate sparse package manifest
+        shell: pwsh
+        run: |
+          winapp init --exe .\artifacts\GlassIsland-Packaged-Test\GlassIsland.exe --sparse --use-defaults
+          if (-not (Test-Path .\sparse\appxmanifest.xml)) {
+            throw "WinApp CLI did not generate sparse\appxmanifest.xml"
+          }
+
+      - name: Declare notification listener capability
+        shell: pwsh
+        run: |
+          [xml]$manifest = Get-Content .\sparse\appxmanifest.xml -Raw
+          $package = $manifest.DocumentElement
+          $package.SetAttribute("xmlns:uap3", "http://schemas.microsoft.com/appx/manifest/uap/windows10/3")
+
+          $ignorable = @(([string]$package.GetAttribute("IgnorableNamespaces")) -split '\\s+' | Where-Object { $_ })
+          if ($ignorable -notcontains "uap3") {
+            $ignorable += "uap3"
+            $package.SetAttribute("IgnorableNamespaces", ($ignorable -join " "))
+          }
+
+          $caps = $package.SelectSingleNode("*[local-name()='Capabilities']")
+          if ($null -eq $caps) {
+            throw "Package manifest has no Capabilities element"
+          }
+
+          $existing = $caps.SelectSingleNode("*[local-name()='Capability' and namespace-uri()='http://schemas.microsoft.com/appx/manifest/uap/windows10/3' and @Name='userNotificationListener']")
+          if ($null -eq $existing) {
+            $capability = $manifest.CreateElement("uap3", "Capability", "http://schemas.microsoft.com/appx/manifest/uap/windows10/3")
+            $capability.SetAttribute("Name", "userNotificationListener")
+            [void]$caps.AppendChild($capability)
+          }
+
+          $manifest.Save((Resolve-Path .\sparse\appxmanifest.xml))
+          [xml]$validated = Get-Content .\sparse\appxmanifest.xml -Raw
+          $listener = $validated.SelectSingleNode("//*[local-name()='Capability' and @Name='userNotificationListener']")
+          if ($null -eq $listener) {
+            throw "userNotificationListener capability was not present after manifest update"
+          }
+          Write-Host "Validated userNotificationListener capability in sparse manifest."
+
+      - name: Create temporary development certificate
+        shell: pwsh
+        run: winapp cert generate --manifest .\sparse\appxmanifest.xml --if-exists skip
+
+      - name: Package sparse identity and embed identity in executable
+        shell: pwsh
+        run: |
+          winapp pack .\sparse\appxmanifest.xml --cert .\devcert.pfx
+          $msix = Get-ChildItem -File -Filter *.msix | Select-Object -First 1
+          if ($null -eq $msix) { throw "WinApp CLI did not produce an MSIX package" }
+          Copy-Item $msix.FullName .\artifacts\GlassIsland-Packaged-Test\GlassIsland-NotificationIdentity.msix -Force
+
+          winapp embed-identity .\artifacts\GlassIsland-Packaged-Test\GlassIsland.exe --manifest .\sparse\appxmanifest.xml
+
+          $certificate = Get-PfxCertificate .\devcert.pfx
+          Export-Certificate -Cert $certificate -FilePath .\artifacts\GlassIsland-Packaged-Test\GlassIsland-Dev.cer -Force | Out-Null
+
+      - name: Create local installation instructions
+        shell: pwsh
+        run: |
+          @'
+          GlassIsland — packaged notification test build
+          ===============================================
+
+          This is a DEVELOPMENT TEST package, not a production-signed release.
+          It is built to test Windows package identity and notification permission.
+          The app may still have runtime issues; record results without capturing notification contents.
+
+          Requirements:
+          - Windows 10/11 x64
+          - Administrator rights for the one-time certificate trust and package registration steps
+
+          Install and run:
+          1. Extract all files to a permanent folder (do not move the folder after registration).
+          2. Open PowerShell as Administrator in that folder.
+          3. Trust the test signing certificate:
+             Import-Certificate -FilePath .\GlassIsland-Dev.cer -CertStoreLocation Cert:\LocalMachine\TrustedPeople
+          4. Register the sparse identity package:
+             Add-AppxPackage -Path .\GlassIsland-NotificationIdentity.msix -ExternalLocation (Get-Location).Path
+          5. Launch .\GlassIsland.exe.
+          6. On first launch, inspect the Windows notification permission flow and test Allow/Deny as documented in docs/PHASE-3-PACKAGE-IDENTITY-TEST.md.
+
+          Unregister the test package (PowerShell as Administrator):
+             Get-AppxPackage | Where-Object { $_.InstallLocation -eq (Get-Location).Path } | Remove-AppxPackage
+
+          Security:
+          - The .cer file contains only the public test certificate. The private .pfx is never uploaded.
+          - Remove the development certificate from Local Computer > Trusted People when testing is complete.
+          - Notification contents are sensitive. Do not attach them to issues, logs, or screenshots.
+          '@ | Set-Content .\artifacts\GlassIsland-Packaged-Test\README-TEST.txt -Encoding utf8
+
+      - name: Upload packaged identity test artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GlassIsland-Packaged-Notification-Test-win-x64
+          path: artifacts/GlassIsland-Packaged-Test/
+          if-no-files-found: error
+          retention-days: 14
