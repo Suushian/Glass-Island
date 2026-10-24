@@ -120,12 +120,12 @@
                             Opacity="0"
                             Margin="0,12,0,0">
                     <Border Height="1" Background="#20FFFFFF" Margin="0,0,0,12" />
-                    <TextBlock Text="Quick controls"
+                    <TextBlock Text="Media controls"
                                FontSize="11"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource TextSecondary}"
                                Margin="2,0,0,9" />
-                    <UniformGrid Columns="3" Rows="1">
+                    <UniformGrid Columns="1" Rows="1">
                         <Border Style="{StaticResource FeatureCardStyle}" Margin="0,0,5,0">
                             <StackPanel>
                                 <TextBlock Text="MEDIA" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
@@ -148,79 +148,8 @@
                                             AutomationProperties.Name="Next track" />
                                 </StackPanel>
                             </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource FeatureCardStyle}" Margin="3,0">
-                            <StackPanel>
-                                <TextBlock Text="AUDIO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
-                                <TextBlock x:Name="AudioDeviceText" Text="No audio output found"
-                                           FontSize="9" Foreground="{StaticResource TextSecondary}"
-                                           Margin="0,5,0,2" TextTrimming="CharacterEllipsis" />
-                                <Slider x:Name="AudioVolumeSlider" Minimum="0" Maximum="100" Value="0"
-                                        IsEnabled="False" Height="22" Margin="0,2,0,2"
-                                        AutomationProperties.Name="Output volume"
-                                        PreviewMouseLeftButtonUp="AudioVolumeSlider_MouseLeftButtonUp"
-                                        KeyUp="AudioVolumeSlider_KeyUp" />
-                                <Button x:Name="AudioMuteButton" Content="Mute" IsEnabled="False"
-                                        Height="24" Margin="0,4,0,0" Click="AudioMuteButton_Click"
-                                        AutomationProperties.Name="Mute or unmute system audio" />
-                            </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource FeatureCardStyle}" Margin="5,0,0,0">
-                            <StackPanel>
-                                <TextBlock Text="NOTIFICATIONS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
-                                <TextBlock x:Name="NotificationCountText" Text="Coming up next" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,6,0,3" />
-                                <TextBlock Text="From your apps" FontSize="10" Foreground="{StaticResource TextSecondary}" />
-                            </StackPanel>
-                        </Border>
-                    </UniformGrid>
-                    <TextBlock x:Name="NotificationStatusText"
-                               Text="Your notifications will show up here."
-                               FontSize="10"
-                               Foreground="{StaticResource TextSecondary}"
-                               Margin="2,12,0,7"
-                               TextWrapping="Wrap" />
-                    <ScrollViewer MaxHeight="155"
-                                  VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl x:Name="NotificationItemsControl">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="#FF171B25"
-                                            BorderBrush="#20FFFFFF"
-                                            BorderThickness="1"
-                                            CornerRadius="10"
-                                            Padding="10,8"
-                                            Margin="0,0,0,6">
-                                        <StackPanel>
-                                            <DockPanel LastChildFill="True">
-                                                <TextBlock Text="{Binding CreatedAt, StringFormat={}{0:g}}"
-                                                           DockPanel.Dock="Right"
-                                                           FontSize="9"
-                                                           Foreground="{StaticResource TextSecondary}"
-                                                           Margin="8,0,0,0" />
-                                                <TextBlock Text="{Binding AppName}"
-                                                           FontSize="9"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{StaticResource Accent}"
-                                                           TextTrimming="CharacterEllipsis" />
-                                            </DockPanel>
-                                            <TextBlock Text="{Binding Title}"
-                                                       FontSize="11"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="{StaticResource TextPrimary}"
-                                                       Margin="0,4,0,2"
-                                                       TextWrapping="Wrap" />
-                                            <TextBlock Text="{Binding Body}"
-                                                       FontSize="10"
-                                                       Foreground="{StaticResource TextSecondary}"
-                                                       TextWrapping="Wrap" />
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                    <TextBlock Text="Media and audio controls depend on what Windows and your device support."
+                        </Border></UniformGrid>
+<TextBlock Text="Controls depend on what your media player supports."
                                FontSize="10"
                                Foreground="#FF7F899A"
                                Margin="2,8,0,1" />
