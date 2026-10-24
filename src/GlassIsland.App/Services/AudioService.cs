@@ -19,7 +19,7 @@ public sealed class AudioService : IDisposable
     private MMDeviceEnumerator? _enumerator;
     private MMDevice? _device;
     private EndpointNotificationClient? _notificationClient;
-    private bool _disposed;
+    private volatile bool _disposed;
 
     public event Action<AudioSnapshot>? StateChanged;
 
