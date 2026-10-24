@@ -13,13 +13,14 @@ namespace GlassIsland.App;
 public partial class MainWindow : Window
 {
     private const double CollapsedHeight = 88;
-    private const double ExpandedHeight = 300;
+    private const double ExpandedHeight = 480;
     private static readonly TimeSpan MotionDuration = TimeSpan.FromMilliseconds(240);
 
     private readonly Forms.ContextMenuStrip _trayMenu;
     private readonly Forms.NotifyIcon _trayIcon;
     private readonly MediaSessionService _mediaService = new();
     private readonly AudioService _audioService = new();
+    private readonly NotificationService _notificationService = new();
     private bool _updatingAudioSlider;
     private bool _isExpanded;
     private bool _allowClose;
@@ -46,6 +47,7 @@ public partial class MainWindow : Window
 
         _mediaService.StateChanged += MediaService_StateChanged;
         _audioService.StateChanged += AudioService_StateChanged;
+        _notificationService.StateChanged += NotificationService_StateChanged;
 
         Loaded += MainWindow_Loaded;
         Closing += MainWindow_Closing;
@@ -58,6 +60,7 @@ public partial class MainWindow : Window
         Height = CollapsedHeight;
         _audioService.Initialize();
         await _mediaService.InitializeAsync();
+        await _notificationService.InitializeAsync();
     }
 
     private void MediaService_StateChanged(MediaSnapshot snapshot)
@@ -124,6 +127,32 @@ public partial class MainWindow : Window
         AudioMuteButton.IsEnabled = snapshot.IsAvailable;
         AudioMuteButton.Content = snapshot.IsMuted ? "Unmute" : "Mute";
         AudioDeviceText.Text = snapshot.IsAvailable ? snapshot.DeviceName : snapshot.Status;
+    }
+
+    private void NotificationService_StateChanged(NotificationSnapshot snapshot)
+    {
+        if (Dispatcher.HasShutdownStarted)
+        {
+            return;
+        }
+
+        if (Dispatcher.CheckAccess())
+        {
+            ApplyNotificationSnapshot(snapshot);
+        }
+        else
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => ApplyNotificationSnapshot(snapshot)));
+        }
+    }
+
+    private void ApplyNotificationSnapshot(NotificationSnapshot snapshot)
+    {
+        NotificationStatusText.Text = snapshot.Status;
+        NotificationCountText.Text = snapshot.HasAccess
+            ? snapshot.Items.Count == 1 ? "1 notification" : $"{snapshot.Items.Count} notifications"
+            : "Not connected yet";
+        NotificationItemsControl.ItemsSource = snapshot.Items;
     }
 
     private async void AudioVolumeSlider_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -306,8 +335,10 @@ public partial class MainWindow : Window
         _disposed = true;
         _mediaService.StateChanged -= MediaService_StateChanged;
         _audioService.StateChanged -= AudioService_StateChanged;
+        _notificationService.StateChanged -= NotificationService_StateChanged;
         _ = _mediaService.DisposeAsync();
         _audioService.Dispose();
+        _notificationService.Dispose();
         SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
         _trayIcon.DoubleClick -= TrayIcon_DoubleClick;
         _trayIcon.Visible = false;
