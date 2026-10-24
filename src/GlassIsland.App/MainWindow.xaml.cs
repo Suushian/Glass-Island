@@ -21,6 +21,7 @@ public partial class MainWindow : Window
     private readonly MediaSessionService _mediaService = new();
     private readonly AudioService _audioService = new();
     private readonly NotificationService _notificationService = new();
+    private readonly DispatcherTimer _notificationAccessTimer = new() { Interval = TimeSpan.FromSeconds(30) };
     private bool _updatingAudioSlider;
     private bool _isExpanded;
     private bool _allowClose;
@@ -50,6 +51,8 @@ public partial class MainWindow : Window
         _notificationService.StateChanged += NotificationService_StateChanged;
 
         Loaded += MainWindow_Loaded;
+        Activated += MainWindow_Activated;
+        _notificationAccessTimer.Tick += NotificationAccessTimer_Tick;
         Closing += MainWindow_Closing;
         SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
     }
@@ -67,6 +70,17 @@ public partial class MainWindow : Window
                 "Connect your notifications",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information));
+        _notificationAccessTimer.Start();
+    }
+
+    private async void MainWindow_Activated(object? sender, EventArgs e)
+    {
+        await _notificationService.CheckAccessStatusAsync();
+    }
+
+    private async void NotificationAccessTimer_Tick(object? sender, EventArgs e)
+    {
+        await _notificationService.CheckAccessStatusAsync();
     }
 
     private void MediaService_StateChanged(MediaSnapshot snapshot)
@@ -342,6 +356,9 @@ public partial class MainWindow : Window
         _mediaService.StateChanged -= MediaService_StateChanged;
         _audioService.StateChanged -= AudioService_StateChanged;
         _notificationService.StateChanged -= NotificationService_StateChanged;
+        Activated -= MainWindow_Activated;
+        _notificationAccessTimer.Stop();
+        _notificationAccessTimer.Tick -= NotificationAccessTimer_Tick;
         _ = _mediaService.DisposeAsync();
         _audioService.Dispose();
         _notificationService.Dispose();
