@@ -199,6 +199,5 @@ public sealed class NotificationService : IDisposable
         }
 
         StateChanged = null;
-        _refreshGate.Dispose();
     }
 }
