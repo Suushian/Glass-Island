@@ -220,7 +220,7 @@ public sealed class MediaSessionService : IAsyncDisposable
             if (title is null)
             {
                 var sourceName = GetSourceDisplayName(session.SourceAppUserModelId);
-                title = sourceName is null ? "Active media" : $"Active media از {sourceName}";
+                title = sourceName is null ? "Active media" : $"Active media from {sourceName}";
             }
 
             if (artist is null)
@@ -266,8 +266,8 @@ public sealed class MediaSessionService : IAsyncDisposable
             "n/a",
             "not available",
             "unknown",
-            "عنوان unknown",
-            "هنرمند unknown"
+            "unknown title",
+            "unknown artist"
         };
 
         return placeholders.Contains(normalized, StringComparer.OrdinalIgnoreCase)
