@@ -25,10 +25,12 @@ Read/change default output volume and mute.
 - Avoid steady-state polling unless a measured platform constraint requires it.
 
 ### FR-005 Notifications
-Display only notifications supported by a documented API and permitted access model.
-- Document API scope and OS support.
-- Show clear unavailable/permission-required state.
-- Apply privacy settings.
+On first launch, request Windows notification access through the documented, permission-compatible API and, after permission is granted, display supported existing and incoming notifications from any app that Windows exposes.
+- Explain the purpose of access in friendly English before the Windows permission prompt.
+- Handle Allowed, Denied, Unspecified, and later-revoked access states.
+- Show all supported notifications in a scrollable list, with source app, timestamp, title, and body when exposed by Windows.
+- Do not log or persist notification content.
+- Show a clear unavailable state if package identity, capability, API, or permission is missing.
 - Never represent unsupported access as implemented.
 
 ### FR-006 Startup
