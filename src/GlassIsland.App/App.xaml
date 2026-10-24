@@ -4,9 +4,15 @@
              StartupUri="MainWindow.xaml"
              ShutdownMode="OnMainWindowClose">
     <Application.Resources>
-        <SolidColorBrush x:Key="TextPrimary" Color="#FFF4F6FB" />
-        <SolidColorBrush x:Key="TextSecondary" Color="#FF9CA5B5" />
-        <SolidColorBrush x:Key="Accent" Color="#FFB6A4FF" />
-        <SolidColorBrush x:Key="PanelBackground" Color="#FF171B25" />
+        <!-- White glass surfaces: deliberately near-opaque for readability on any wallpaper. -->
+        <SolidColorBrush x:Key="TextPrimary" Color="#FF202334" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#FF73788A" />
+        <SolidColorBrush x:Key="TextTertiary" Color="#FF969BAD" />
+        <SolidColorBrush x:Key="Accent" Color="#FF7C70E8" />
+        <SolidColorBrush x:Key="AccentSurface" Color="#FFF0EDFF" />
+        <SolidColorBrush x:Key="SurfaceGlass" Color="#FDFDFEFF" />
+        <SolidColorBrush x:Key="SurfaceBorder" Color="#FFE4E7F0" />
+        <SolidColorBrush x:Key="DividerBrush" Color="#FFE8EAF1" />
+        <SolidColorBrush x:Key="PanelBackground" Color="#FFF8F9FC" />
     </Application.Resources>
 </Application>
