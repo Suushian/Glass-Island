@@ -73,7 +73,7 @@
                         Grid.Row="0"
                         Style="{StaticResource HeaderButtonStyle}"
                         Click="ToggleButton_Click"
-                        AutomationProperties.Name="گسترش یا جمع‌کردن GlassIsland">
+                        AutomationProperties.Name="Expand or collapse GlassIsland">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="42" />
@@ -99,7 +99,7 @@
                                        Foreground="{StaticResource TextPrimary}" />
                             <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
                                 <Ellipse Width="5" Height="5" Fill="#FF8BD5B0" VerticalAlignment="Center" />
-                                <TextBlock Text="  Shell آماده است"
+                                <TextBlock Text="  All set"
                                            FontSize="10.5"
                                            Foreground="{StaticResource TextSecondary}" />
                             </StackPanel>
@@ -120,63 +120,40 @@
                             Opacity="0"
                             Margin="0,12,0,0">
                     <Border Height="1" Background="#20FFFFFF" Margin="0,0,0,12" />
-                    <TextBlock Text="دسترسی سریع"
+                    <TextBlock Text="Media controls"
                                FontSize="11"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource TextSecondary}"
                                Margin="2,0,0,9" />
-                    <UniformGrid Columns="3" Rows="1">
-                        <Border Style="{StaticResource FeatureCardStyle}" Margin="0,0,5,0">
+                    <UniformGrid Columns="1" Rows="1">
+                        <Border Style="{StaticResource FeatureCardStyle}" Margin="0">
                             <StackPanel>
                                 <TextBlock Text="MEDIA" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
-                                <TextBlock x:Name="MediaTitleText" Text="هیچ رسانه‌ای پخش نمی‌شود"
+                                <TextBlock x:Name="MediaTitleText" Text="Nothing playing right now"
                                            FontSize="10.5" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"
                                            Margin="0,6,0,2" TextTrimming="CharacterEllipsis" />
-                                <TextBlock x:Name="MediaArtistText" Text="یک برنامهٔ رسانه‌ای را اجرا کنید"
+                                <TextBlock x:Name="MediaArtistText" Text="Play something and it'll show up here"
                                            FontSize="9" Foreground="{StaticResource TextSecondary}"
                                            TextTrimming="CharacterEllipsis" />
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
                                     <Button x:Name="MediaPreviousButton" Content="⏮" Width="24" Height="24"
                                             Margin="0,0,4,0" IsEnabled="False" Click="MediaPrevious_Click"
-                                            AutomationProperties.Name="رسانهٔ قبلی" />
+                                            AutomationProperties.Name="Previous track" />
                                     <Button x:Name="MediaPlayPauseButton" Content="▶" Width="28" Height="24"
                                             Margin="0,0,4,0" IsEnabled="False" Click="MediaPlayPause_Click"
-                                            AutomationProperties.Name="پخش یا مکث" />
+                                            AutomationProperties.Name="Play or pause" />
                                     <Button x:Name="MediaNextButton" Content="⏭" Width="24" Height="24"
                                             IsEnabled="False" Click="MediaNext_Click"
-                                            AutomationProperties.Name="رسانهٔ بعدی" />
+                                            AutomationProperties.Name="Next track" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource FeatureCardStyle}" Margin="3,0">
-                            <StackPanel>
-                                <TextBlock Text="AUDIO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
-                                <TextBlock x:Name="AudioDeviceText" Text="خروجی صدا در دسترس نیست"
-                                           FontSize="9" Foreground="{StaticResource TextSecondary}"
-                                           Margin="0,5,0,2" TextTrimming="CharacterEllipsis" />
-                                <Slider x:Name="AudioVolumeSlider" Minimum="0" Maximum="100" Value="0"
-                                        IsEnabled="False" Height="22" Margin="0,2,0,2"
-                                        AutomationProperties.Name="حجم صدای خروجی"
-                                        PreviewMouseLeftButtonUp="AudioVolumeSlider_MouseLeftButtonUp"
-                                        KeyUp="AudioVolumeSlider_KeyUp" />
-                                <Button x:Name="AudioMuteButton" Content="قطع صدا" IsEnabled="False"
-                                        Height="24" Margin="0,4,0,0" Click="AudioMuteButton_Click"
-                                        AutomationProperties.Name="قطع یا فعال‌کردن صدای سیستم" />
-                            </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource FeatureCardStyle}" Margin="5,0,0,0">
-                            <StackPanel>
-                                <TextBlock Text="ALERTS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
-                                <TextBlock Text="اعلان‌ها" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,6,0,3" />
-                                <TextBlock Text="در فاز ۳" FontSize="10" Foreground="{StaticResource TextSecondary}" />
-                            </StackPanel>
-                        </Border>
                     </UniformGrid>
-                    <TextBlock Text="رسانه و صدا بر اساس قابلیت‌های ویندوز و دستگاه فعال می‌شوند."
+                    <TextBlock Text="Controls depend on what your media player supports."
                                FontSize="10"
                                Foreground="#FF7F899A"
-                               Margin="2,11,0,1" />
+                               Margin="2,8,0,1" />
                 </StackPanel>
             </Grid>
         </Border>

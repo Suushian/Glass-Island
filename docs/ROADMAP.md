@@ -1,62 +1,65 @@
 # Implementation Roadmap
 
 ## Milestone 0 — repository baseline
+
 - [x] Add source structure and reproducible build instructions.
 - [x] Add a Windows Release build workflow.
-- [x] Confirm successful Windows CI Release build and x64 Debug publish.
+- [x] Confirm Windows CI Release build and x64 publish.
 - [ ] Record baseline startup time, working set, and idle CPU.
+
 **Exit:** Release build succeeds; machine/OS are recorded; no unmeasured performance claims.
 
-**Status:** CI build and publish succeeded on Windows GitHub Actions. Performance baselines remain unmeasured.
-
 ## Milestone 1 — stable shell
+
 - [x] Borderless topmost WPF window and collapsed/expanded interaction.
-- [x] Tray show/hide/exit and explicit unavailable states for later integrations.
+- [x] Tray show/hide/exit and graceful unavailable states.
 - [x] Eased transitions with no idle animation loop.
 - [x] Reposition on display-settings changes and declare per-monitor DPI awareness.
-- [x] Wire application startup to `MainWindow.xaml` and verify the published executable launches.
-- [x] Verify basic startup, visible overlay, expand/collapse, Escape-to-collapse, and tray Exit on Windows (user-reported manual acceptance).
+- [x] Basic startup, visible shell, expand/collapse, Escape-to-collapse, and tray Exit manually accepted on Windows.
 - [ ] Verify no off-screen placement across monitor changes and mixed-DPI configurations.
 - [ ] Verify focus behavior and responsiveness on Windows.
-**Exit:** no off-screen placement after monitor changes; no focus stealing during passive updates; shell remains responsive when integrations are unavailable.
 
-**Status:** Phase 1 basic acceptance is complete: Windows CI passed and user-reported manual smoke tests passed. Advanced multi-monitor/mixed-DPI and focus behavior remain explicit follow-up validation items. Current placement defaults to the primary display.
+**Exit:** no off-screen placement after monitor changes; no focus stealing during passive updates; shell remains responsive when media is unavailable.
 
-## Milestone 2 — media and audio
+## Milestone 2 — media controls
+
 - [x] Add an event-driven GSMTC adapter for current-session metadata/playback state and supported previous/play-pause/next commands.
-- [x] Add default multimedia output volume/mute read/write and event-driven volume/default-endpoint notifications.
-- [x] Manually validate media-session behavior, metadata fallbacks, unsupported transport commands, volume/mute, endpoint changes, and shutdown on Windows (user-reported acceptance).
-- [x] Confirm Telegram track title and artist display correctly on the user's Windows installation.
-**Exit:** Phase 2 implementation, Windows CI build/publish, and user-reported manual acceptance are complete. Automated regression tests and extended multi-monitor/performance testing remain follow-up quality work.
-
-### Phase 2 metadata follow-up
-- [x] Replace empty/common placeholder title and artist values with meaningful fallbacks.
+- [x] Add meaningful fallbacks for missing title/artist metadata.
 - [x] Use album artist when the track artist is missing.
-- [x] Identify common media sources in the fallback title where GSMTC exposes a recognizable app ID.
 - [x] Disable an individual transport command when the active player declines it.
-- [x] Confirm Telegram metadata behavior on the user's Windows installation.
-- [ ] Add automated tests once the test project is introduced.
+- [x] Manually validate media-session behavior and Telegram title/artist display on the user's Windows installation.
+- [ ] Add automated regression coverage for media-session state and lifecycle.
+- [ ] Re-run the media acceptance matrix after the media-only cleanup.
 
-**Limitation:** GSMTC only provides metadata published by the media player. The fallback improves the UI state but cannot infer the real track title when a player does not publish it.
+**Limitation:** GSMTC only provides metadata published by the media player. The fallback cannot infer a real track title that the player does not publish.
 
-## Milestone 3 — notification proof-of-concept
-- Validate documented APIs, permissions, supported OS versions, and feasible scenarios.
-- Record API decision/limitations before building UX.
-- Add privacy controls and integration tests only for supported behavior.
-**Exit:** no unsupported access techniques; graceful unavailable state; no notification content in logs.
+## Product scope decision — media only
 
-## Milestone 4 — startup and settings
-Opt-in per-user launch, reliable cleanup, start collapsed, reduced-motion/privacy settings, safe persistence defaults.
+The notification-listener proof of concept and system audio/volume controls have been removed from the active product scope. Do not implement notification access, request notification permission, add `userNotificationListener`, or add audio endpoint controls unless the product scope is explicitly changed later. The old notification test/package workflow is not part of the media-only deliverable.
 
-## Milestone 5 — visual polish and performance
-Explore supported native backdrops; test themes/high contrast, animations, multi-monitor/DPI; profile rendering.
+**Current cleanup acceptance:**
+- [x] UI contains only shell and media-session controls.
+- [x] No notification or audio adapter/service remains in the app project.
+- [x] Unused NAudio dependency is removed.
+- [x] Product, UX, architecture, security, test, and build docs describe media-only scope.
+- [x] Notification-specific POC and package-identity runbooks are removed.
+- [x] Windows Release build and self-contained x64 publish pass (CI run 40097735812).
 
-## Milestone 6 — packaging and release
-Choose installer/MSIX, signing/update policy, clean install/upgrade/uninstall tests, support matrix and known issues.
+## Milestone 3 — quality and accessibility
+
+- [ ] Add automated tests for media state mapping and fallback behavior.
+- [ ] Validate keyboard operation, accessible names, text scaling, and high contrast.
+- [ ] Validate multi-monitor and mixed-DPI placement.
+- [ ] Measure startup, idle CPU, and working set using a repeatable protocol.
+
+## Milestone 4 — packaging and release
+
+- [ ] Choose installer and signing approach.
+- [ ] Test clean install, upgrade, and uninstall.
+- [ ] Document supported Windows versions and known media-player limitations.
 
 ## Priorities
-P0: reliable shell, lifecycle, media/audio foundations, graceful failure.  
-P1: validated notifications, startup, tray, settings.  
-P2: advanced themes, per-monitor customization, optional integrations.
 
-No calendar estimates until Windows support, notification scope, and packaging requirements are confirmed.
+P0: reliable shell and media controls.  
+P1: regression coverage, accessibility, and display compatibility.  
+P2: visual polish and optional future features only after explicit scope review.

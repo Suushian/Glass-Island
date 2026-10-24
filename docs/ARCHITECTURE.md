@@ -1,83 +1,45 @@
 # Architecture
 
-## Proposed stack
-- C# and WPF on a Windows-specific .NET target; .NET 8 is the initial documented baseline and should be reassessed before release.
-- MVVM-style separation for presentation and application state.
+## Stack
+
+- C# and WPF on `.NET 8`, targeting `net8.0-windows10.0.19041.0`.
 - Windows Global System Media Transport Controls (GSMTC) for supported media sessions.
-- Windows Core Audio APIs for endpoint volume and mute.
-- Notification implementation remains undecided until a proof-of-concept validates supported APIs and permissions.
-- Per-user, opt-in startup registration.
-- Unit tests for platform-neutral logic and Windows integration tests for OS adapters.
+- Windows Forms `NotifyIcon` for the system tray.
+- No audio-control or notification-listener integration.
 
-## Target layout
-```text
-GlassIsland/
-├── GlassIsland.sln
-├── README.md
-├── docs/
-├── src/
-│   ├── GlassIsland.App/
-│   ├── GlassIsland.Core/
-│   └── GlassIsland.Windows/
-├── tests/
-│   ├── GlassIsland.Core.Tests/
-│   └── GlassIsland.Windows.Tests/
-└── packaging/
-```
-This is a target layout, not a claim that these projects already exist. The current implementation still keeps the WPF app and its Windows adapters in one project; the media and audio adapters live under `src/GlassIsland.App/Services/`.
+The current implementation keeps the WPF shell and media adapter in `src/GlassIsland.App/`. This is intentionally simpler than the future target layout; no additional projects are required for the current scope.
 
-## Phase 2 implementation status
-- `MediaSessionService` uses the Windows Global System Media Transport Controls API and listens for current-session, session-list, media-property, and playback-state changes.
-- `AudioService` uses NAudio Core Audio APIs to read/set the default multimedia render endpoint volume and mute state, listens for volume notifications, and rebinds when the default render endpoint changes.
-- Both services publish snapshots and represent unavailable states instead of taking down the shell. UI callbacks marshal state updates onto the WPF Dispatcher.
-- Phase 2 was accepted after the user confirmed Windows runtime behavior, including correct Telegram title/artist display. The latest Windows Release build and self-contained x64 Debug publish passed in [run 40092533594](https://github.com/Suushian/Glass-Island/actions/runs/40092533594).
-- Automated unit/integration test projects remain future work; build success is not a substitute for runtime compatibility testing.
+## Implemented media adapter
 
-## Boundaries
-- App: WPF startup, windows, view models, resources, settings.
-- Core: immutable state models, interfaces, coordination, validation.
-- Windows: GSMTC, Core Audio, window placement, startup, and any validated notification adapter.
-- Tests: unit tests and Windows-only integration coverage.
-- Packaging: installer metadata and release scripts.
+`MediaSessionService`:
+- Requests the GSMTC session manager.
+- Tracks the current session and listens for session-list, current-session, media-property, and playback-state changes.
+- Publishes media snapshots and safe fallback states when metadata or the session is unavailable.
+- Exposes previous, play/pause, and next commands and disables commands the active player declines.
+- Unsubscribes event handlers during disposal.
 
-## Contracts (illustrative)
-```csharp
-public interface IMediaService
-{
-    event EventHandler<MediaSnapshot>? StateChanged;
-    Task InitializeAsync(CancellationToken cancellationToken);
-    Task PlayPauseAsync(CancellationToken cancellationToken);
-    Task NextAsync(CancellationToken cancellationToken);
-    Task PreviousAsync(CancellationToken cancellationToken);
-}
-
-public interface IAudioService
-{
-    event EventHandler<AudioSnapshot>? StateChanged;
-    Task InitializeAsync(CancellationToken cancellationToken);
-    Task SetVolumeAsync(float normalizedVolume, CancellationToken cancellationToken);
-    Task SetMutedAsync(bool isMuted, CancellationToken cancellationToken);
-}
-```
-These are design examples, not existing implementation. Define snapshot models and error contracts before coding. Keep COM objects and native handles out of the UI layer.
+The UI marshals updates to the WPF Dispatcher and keeps the shell usable if GSMTC initialization or a media session is unavailable.
 
 ## State flow
-1. Start the shell in a usable collapsed state.
-2. Initialize each integration independently.
-3. Publish initial snapshots and availability states.
-4. Marshal immutable state changes onto the WPF Dispatcher.
-5. Update only affected UI elements.
-6. Mark failed integrations unavailable without terminating the shell.
-7. Unsubscribe events and dispose native resources on shutdown.
+
+1. Start the shell in a collapsed state.
+2. Initialize the media-session adapter.
+3. Publish the initial media snapshot or an unavailable state.
+4. Marshal state changes onto the WPF Dispatcher.
+5. Update the metadata and transport controls.
+6. Unsubscribe from session events on application exit.
 
 ## Resource and threading policy
-Prefer OS events over polling. Keep callbacks short; marshal state to the UI thread. Avoid blocking UI calls, idle animations, and repeated layout work. Bound album-art memory and debounce event bursts without making controls feel delayed. Pass CancellationToken to asynchronous initialization and clean up deterministically.
+
+Prefer OS events over polling. Keep callbacks short; marshal UI state to the Dispatcher. Avoid blocking UI calls, idle animations, and repeated layout work. Dispose subscriptions and native resources deterministically.
 
 ## Windowing
-Use a borderless topmost window without a normal taskbar button. Position against the selected monitor/work area, account for DPI, and recalculate after display topology changes. Passive events must not steal focus. Define a full-screen policy and ensure resolution changes cannot strand the window off-screen.
 
-## Availability and errors
-Represent states such as Available, Unavailable, PermissionRequired, Unsupported, and TemporarilyFailed. Messages should be actionable and non-repetitive.
+Use a borderless topmost window without a normal taskbar button. Position against the primary monitor's work area and recalculate after display topology changes. Passive media updates must not steal focus. Mixed-DPI and multi-monitor behavior remain validation items.
 
-## Known uncertainties
-WPF transparency is not equivalent to native Acrylic/Mica. GSMTC metadata varies by player. Core Audio COM lifetime needs careful handling. Notification access is the highest-risk capability. Deployment mode affects package size and runtime prerequisites.
+## Availability and limitations
+
+- GSMTC exposes only the metadata and transport capabilities published by a media player.
+- Some players do not provide track title/artist or decline transport commands.
+- Fallback labels improve clarity but cannot reconstruct metadata that the player never publishes.
+- No notification capability, notification permission flow, system-volume adapter, or package identity is required by the current product scope.

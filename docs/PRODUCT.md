@@ -1,36 +1,43 @@
 # Product Requirements — GlassIsland
 
 ## Summary
-GlassIsland is a lightweight Windows desktop companion inspired by Dynamic Island interactions. A compact floating surface near the top-center of a display presents media state, system audio controls, and—only where supported—notification previews.
+
+GlassIsland is a lightweight Windows desktop companion inspired by Dynamic Island interactions. Its only integration is the active supported media session: the floating surface shows track metadata and playback state and exposes transport controls.
 
 ## Problem
-Checking a track, pausing playback, adjusting volume, or noticing an alert often requires opening a separate system panel or switching applications. GlassIsland aims to make these actions glanceable without becoming a full dashboard.
+
+Checking a track or pausing playback often requires switching applications. GlassIsland makes the current media session glanceable and controllable without becoming a full dashboard.
 
 ## Target users
+
 - Windows users who listen to media while working.
 - People who want a compact, unobtrusive desktop overlay.
 - Users who value keyboard/mouse access and low background resource use.
 
 ## Goals
-- Combine media, volume, and supported notifications in one compact overlay.
-- Remain unobtrusive while idle and avoid continuous polling.
-- Keep integrations independent so one failure does not stop the shell.
-- Keep data local and avoid telemetry by default.
-- Make startup behavior opt-in and reversible.
 
-## Non-goals
-Cloud accounts/synchronization, replacing Windows system controls, unrestricted notification history, guaranteed support for every media player, advertisements, analytics, plugins, macOS, and mobile.
+- Display current-session metadata and playback state.
+- Offer previous, play/pause, and next when supported by the player.
+- Remain unobtrusive while idle and avoid continuous polling.
+- Keep media metadata local and avoid telemetry by default.
+- Continue to function when no supported media session is available.
+
+## Explicit non-goals
+
+- Windows notification previews, notification history, or notification-listener access.
+- System volume or mute controls.
+- Cloud accounts/synchronization, analytics, advertisements, plugins, macOS, and mobile.
+- Guaranteed metadata or transport support for every media player.
 
 ## Functional scope
-- **P0 — Shell:** borderless floating window, collapsed/expanded states, tray show/hide/exit, display/DPI recovery, graceful failures.
+
+- **P0 — Shell:** borderless floating window, collapsed/expanded states, tray show/hide/exit, display/DPI recovery, graceful failure.
 - **P1 — Media:** supported session metadata and playback state; transport commands when available.
-- **P1 — Audio:** default output volume/mute state, changes, and endpoint recovery.
-- **P1 — Notifications:** first validate documented APIs and permissions; never imply unsupported access is implemented.
-- **P2 — Personalization:** opt-in startup, reduced motion, privacy controls, display placement if feasible.
+- **P2 — Polish:** accessibility, performance, mixed-DPI behavior, and release packaging.
 
 ## Success measures (proposed, not measured)
+
 - No unnecessary recurring work while idle.
-- Core features survive unavailable integrations.
-- Startup can be disabled without stale registration.
-- Accessibility and supported OS scenarios pass a documented test matrix.
-- CPU, memory, and startup claims are backed by repeatable measurements.
+- Media-session changes update the UI without stale-session data.
+- Unsupported players/commands do not crash the shell.
+- CPU, memory, startup, and compatibility claims are backed by repeatable measurements.

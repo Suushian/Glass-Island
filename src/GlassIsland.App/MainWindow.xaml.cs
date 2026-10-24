@@ -13,14 +13,12 @@ namespace GlassIsland.App;
 public partial class MainWindow : Window
 {
     private const double CollapsedHeight = 88;
-    private const double ExpandedHeight = 300;
+    private const double ExpandedHeight = 270;
     private static readonly TimeSpan MotionDuration = TimeSpan.FromMilliseconds(240);
 
     private readonly Forms.ContextMenuStrip _trayMenu;
     private readonly Forms.NotifyIcon _trayIcon;
     private readonly MediaSessionService _mediaService = new();
-    private readonly AudioService _audioService = new();
-    private bool _updatingAudioSlider;
     private bool _isExpanded;
     private bool _allowClose;
     private bool _disposed;
@@ -30,10 +28,10 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         _trayMenu = new Forms.ContextMenuStrip();
-        _trayMenu.Items.Add("نمایش GlassIsland", null, (_, _) => ShowFromTray());
-        _trayMenu.Items.Add("مخفی‌کردن", null, (_, _) => Hide());
+        _trayMenu.Items.Add("Show GlassIsland", null, (_, _) => ShowFromTray());
+        _trayMenu.Items.Add("Hide", null, (_, _) => Hide());
         _trayMenu.Items.Add(new Forms.ToolStripSeparator());
-        _trayMenu.Items.Add("خروج", null, (_, _) => ExitApplication());
+        _trayMenu.Items.Add("Quit GlassIsland", null, (_, _) => ExitApplication());
 
         _trayIcon = new Forms.NotifyIcon
         {
@@ -45,7 +43,6 @@ public partial class MainWindow : Window
         _trayIcon.DoubleClick += TrayIcon_DoubleClick;
 
         _mediaService.StateChanged += MediaService_StateChanged;
-        _audioService.StateChanged += AudioService_StateChanged;
 
         Loaded += MainWindow_Loaded;
         Closing += MainWindow_Closing;
@@ -56,7 +53,6 @@ public partial class MainWindow : Window
     {
         PositionWindow();
         Height = CollapsedHeight;
-        _audioService.Initialize();
         await _mediaService.InitializeAsync();
     }
 
@@ -90,65 +86,6 @@ public partial class MainWindow : Window
     private async void MediaPlayPause_Click(object sender, RoutedEventArgs e) => await _mediaService.PlayPauseAsync();
     private async void MediaPrevious_Click(object sender, RoutedEventArgs e) => await _mediaService.PreviousAsync();
     private async void MediaNext_Click(object sender, RoutedEventArgs e) => await _mediaService.NextAsync();
-
-    private void AudioService_StateChanged(AudioSnapshot snapshot)
-    {
-        if (Dispatcher.HasShutdownStarted)
-        {
-            return;
-        }
-
-        if (Dispatcher.CheckAccess())
-        {
-            ApplyAudioSnapshot(snapshot);
-        }
-        else
-        {
-            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => ApplyAudioSnapshot(snapshot)));
-        }
-    }
-
-    private void ApplyAudioSnapshot(AudioSnapshot snapshot)
-    {
-        _updatingAudioSlider = true;
-        try
-        {
-            AudioVolumeSlider.Value = snapshot.Volume * 100d;
-        }
-        finally
-        {
-            _updatingAudioSlider = false;
-        }
-
-        AudioVolumeSlider.IsEnabled = snapshot.IsAvailable;
-        AudioMuteButton.IsEnabled = snapshot.IsAvailable;
-        AudioMuteButton.Content = snapshot.IsMuted ? "فعال‌کردن صدا" : "قطع صدا";
-        AudioDeviceText.Text = snapshot.IsAvailable ? snapshot.DeviceName : snapshot.Status;
-    }
-
-    private async void AudioVolumeSlider_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-    {
-        if (!_updatingAudioSlider)
-        {
-            await _audioService.SetVolumeAsync((float)(AudioVolumeSlider.Value / 100d));
-        }
-    }
-
-    private async void AudioVolumeSlider_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-    {
-        if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown)
-        {
-            await _audioService.SetVolumeAsync((float)(AudioVolumeSlider.Value / 100d));
-        }
-    }
-
-    private async void AudioMuteButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_audioService.Current.IsAvailable)
-        {
-            await _audioService.SetMutedAsync(!_audioService.Current.IsMuted);
-        }
-    }
 
     private void ToggleButton_Click(object sender, RoutedEventArgs e)
     {
@@ -305,9 +242,7 @@ public partial class MainWindow : Window
 
         _disposed = true;
         _mediaService.StateChanged -= MediaService_StateChanged;
-        _audioService.StateChanged -= AudioService_StateChanged;
         _ = _mediaService.DisposeAsync();
-        _audioService.Dispose();
         SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
         _trayIcon.DoubleClick -= TrayIcon_DoubleClick;
         _trayIcon.Visible = false;

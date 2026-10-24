@@ -1,10 +1,19 @@
 # GlassIsland
 
-**A lightweight Windows Dynamic Island-style desktop companion**
+**A lightweight Windows Dynamic Island-style media controller**
 
-GlassIsland is a Windows desktop utility with a compact floating surface near the top-center of the display. The MVP target is a minimal, smoothly animated shell with controls for the active supported media session, system output volume, and Windows notifications where documented APIs and permissions allow them.
+GlassIsland is a compact floating Windows desktop companion for the active supported media session. It displays track metadata and playback state and provides previous, play/pause, and next controls when the media player supports them.
 
-> **Current status:** Phase 1 and Phase 2 are merged into `main`. Phase 2 provides Windows media-session metadata and transport controls, plus default output volume/mute controls. The latest Windows CI build and self-contained x64 Debug publish passed in [run 40092533594](https://github.com/Suushian/Glass-Island/actions/runs/40092533594), and the user confirmed the Windows build works, including correct Telegram track title and artist display. Notifications remain Phase 3. See the [roadmap](docs/ROADMAP.md).
+## Current scope
+
+GlassIsland is intentionally media-only:
+- Floating shell with collapsed and expanded states, tray show/hide/exit, and display-position recovery.
+- Active-session metadata and playback state through Windows Global System Media Transport Controls (GSMTC).
+- Previous, play/pause, and next commands when exposed by the active player.
+
+System volume controls and notification previews/listening are not part of the product. The app does not request notification access, declare the `userNotificationListener` capability, or require a package-identity test workflow.
+
+Phase 1 shell and Phase 2 media-session behavior were previously manually validated by the user on Windows, including Telegram track title and artist display. The media-only cleanup is in progress on a separate branch and must pass Windows CI before it is considered validated.
 
 ## Run locally
 
@@ -16,10 +25,11 @@ dotnet build .\GlassIsland.sln -c Release
 dotnet run --project .\src\GlassIsland.App\GlassIsland.App.csproj
 ```
 
-The app provides the floating shell and tray lifecycle, event-driven Windows media-session controls, and default output volume/mute controls. When a media session or audio endpoint is unavailable, the corresponding controls remain disabled.
+The application requires no notification permission and does not control system output volume. If no supported media session is active, media controls remain disabled and a clear fallback state is shown.
 
 ## Documentation
-- [Product requirements](docs/PRODUCT.md)
+
+- [Product scope](docs/PRODUCT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Architecture decisions](docs/ADR.md)
 - [UX and visual design](docs/UX-DESIGN.md)
@@ -34,21 +44,19 @@ The app provides the floating shell and tray lifecycle, event-driven Windows med
 - [Glossary](docs/GLOSSARY.md)
 
 ## Product principles
-1. **Lightweight by design:** prefer event-driven integrations over continuous polling.
-2. **Native where practical:** use Windows APIs where supported and justified.
-3. **Unobtrusive:** collapsed UI remains small and passive.
-4. **Graceful degradation:** one unavailable integration must not break the shell.
-5. **Privacy-respecting:** no telemetry by default; notification access must be documented and permission-compatible.
-6. **Evidence-based:** performance and compatibility claims require repeatable tests.
 
-## Planned stack
+1. Keep the overlay lightweight and unobtrusive.
+2. Prefer event-driven media updates over continuous polling.
+3. Degrade gracefully when a player or transport command is unavailable.
+4. Keep media metadata local and out of logs.
+5. Make no performance or compatibility claims without repeatable evidence.
 
-C# / WPF on .NET 8; Windows SDK projections for GSMTC media sessions; NAudio Core Audio endpoint volume and device notifications. Notification implementation remains gated on a technical proof-of-concept.
+## Stack
+
+C# / WPF on .NET 8, Windows GSMTC projections, and Windows Forms for the system-tray icon. No third-party audio-control dependency is required.
 
 ## Validation status
 
-- **Phase 1 CI:** Release build and self-contained Windows x64 Debug publish succeeded in [run 40017882776](https://github.com/Suushian/Glass-Island/actions/runs/40017882776).
-- **Phase 1 manual smoke test:** user confirmed startup, visible shell, expand/collapse, Escape-to-collapse, and tray Exit.
-- **Phase 2 CI:** Release build and self-contained Windows x64 Debug publish passed in [run 40092533594](https://github.com/Suushian/Glass-Island/actions/runs/40092533594).
-- **Phase 2 manual validation:** user confirmed the Windows build and media/audio behavior work correctly, including Telegram track title and artist metadata.
-- **Remaining before a production release:** automated regression tests, mixed-DPI/multi-monitor validation, performance measurements, installer/signing, and notification integration.
+- Phase 1 shell and Phase 2 media-session behavior were manually accepted on the user's Windows installation.
+- The media-only cleanup requires a fresh Windows Release build and self-contained x64 publish in CI.
+- Remaining release work includes automated regression coverage, mixed-DPI/multi-monitor validation, performance measurements, installer/signing, and release packaging.
