@@ -30,7 +30,7 @@ This is a target layout, not a claim that these projects already exist. The curr
 - `MediaSessionService` uses the Windows Global System Media Transport Controls API and listens for current-session, session-list, media-property, and playback-state changes.
 - `AudioService` uses NAudio Core Audio APIs to read/set the default multimedia render endpoint volume and mute state, listens for volume notifications, and rebinds when the default render endpoint changes.
 - Both services publish snapshots and represent unavailable states instead of taking down the shell. UI callbacks marshal state updates onto the WPF Dispatcher.
-- The Phase 2 code is awaiting a successful Windows CI build and manual runtime validation; implementation status must not be confused with acceptance.
+- Windows Release build and self-contained x64 Debug publish passed in [run 40089478714](https://github.com/Suushian/Glass-Island/actions/runs/40089478714). Manual runtime validation is still required; implementation status must not be confused with acceptance.
 
 ## Boundaries
 - App: WPF startup, windows, view models, resources, settings.
