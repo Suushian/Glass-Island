@@ -99,6 +99,33 @@ jobs:
 
           winapp embed-identity .\artifacts\GlassIsland-Packaged-Test\GlassIsland.exe --manifest .\sparse\appxmanifest.xml
 
+      - name: Smoke-test sparse package registration
+        shell: pwsh
+        run: |
+          $certificatePath = (Resolve-Path .\artifacts\GlassIsland-Packaged-Test\GlassIsland-Dev.cer).Path
+          $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($certificatePath)
+          $package = $null
+          Import-Certificate -FilePath $certificatePath -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null
+          try {
+            $externalLocation = (Resolve-Path .\artifacts\GlassIsland-Packaged-Test).Path
+            Add-AppxPackage -Path (Resolve-Path .\artifacts\GlassIsland-Packaged-Test\GlassIsland-NotificationIdentity.msix).Path -ExternalLocation $externalLocation
+            $package = Get-AppxPackage -Name "GlassIsland" | Select-Object -First 1
+            if ($null -eq $package) { throw "Windows did not register the GlassIsland sparse package" }
+
+            [xml]$installedManifest = Get-AppxPackageManifest -Package $package
+            $capability = $installedManifest.SelectSingleNode("//*[local-name()='Capability' and @Name='userNotificationListener']")
+            if ($null -eq $capability) { throw "Installed package manifest is missing userNotificationListener" }
+
+            Write-Host "Sparse package registration passed: $($package.PackageFamilyName)"
+            Write-Host "Installed manifest contains userNotificationListener."
+          }
+          finally {
+            if ($null -ne $package) {
+              Remove-AppxPackage -Package $package.PackageFullName -ErrorAction SilentlyContinue
+            }
+            Remove-Item "Cert:\LocalMachine\TrustedPeople\$($certificate.Thumbprint)" -ErrorAction SilentlyContinue
+          }
+
       - name: Create local installation instructions
         shell: pwsh
         run: |
