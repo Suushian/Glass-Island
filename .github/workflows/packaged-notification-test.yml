@@ -86,20 +86,18 @@ jobs:
 
       - name: Create temporary development certificate
         shell: pwsh
-        run: winapp cert generate --manifest .\sparse\appxmanifest.xml --if-exists skip
+        run: winapp cert generate --manifest .\sparse\appxmanifest.xml --if-exists skip --export-cer
 
       - name: Package sparse identity and embed identity in executable
         shell: pwsh
         run: |
-          winapp pack .\sparse\appxmanifest.xml --cert .\devcert.pfx
-          $msix = Get-ChildItem -File -Filter *.msix | Select-Object -First 1
-          if ($null -eq $msix) { throw "WinApp CLI did not produce an MSIX package" }
-          Copy-Item $msix.FullName .\artifacts\GlassIsland-Packaged-Test\GlassIsland-NotificationIdentity.msix -Force
+          winapp pack .\sparse\appxmanifest.xml --cert .\devcert.pfx --cert-password password --output .\GlassIsland-NotificationIdentity.msix
+          if (-not (Test-Path .\GlassIsland-NotificationIdentity.msix)) { throw "WinApp CLI did not produce an MSIX package" }
+          Copy-Item .\GlassIsland-NotificationIdentity.msix .\artifacts\GlassIsland-Packaged-Test\GlassIsland-NotificationIdentity.msix -Force
+          Copy-Item .\devcert.cer .\artifacts\GlassIsland-Packaged-Test\GlassIsland-Dev.cer -Force
+          Copy-Item .\sparse\Assets .\artifacts\GlassIsland-Packaged-Test\Assets -Recurse -Force
 
           winapp embed-identity .\artifacts\GlassIsland-Packaged-Test\GlassIsland.exe --manifest .\sparse\appxmanifest.xml
-
-          $certificate = Get-PfxCertificate .\devcert.pfx
-          Export-Certificate -Cert $certificate -FilePath .\artifacts\GlassIsland-Packaged-Test\GlassIsland-Dev.cer -Force | Out-Null
 
       - name: Create local installation instructions
         shell: pwsh
