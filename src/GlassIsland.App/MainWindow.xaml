@@ -162,7 +162,7 @@
                                         KeyUp="AudioVolumeSlider_KeyUp" />
                                 <Button x:Name="AudioMuteButton" Content="Mute" IsEnabled="False"
                                         Height="24" Margin="0,4,0,0" Click="AudioMuteButton_Click"
-                                        AutomationProperties.Name="قطع یا Unmuteی سیستم" />
+                                        AutomationProperties.Name="Mute or unmute system audio" />
                             </StackPanel>
                         </Border>
                         <Border Style="{StaticResource FeatureCardStyle}" Margin="5,0,0,0">
