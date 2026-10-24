@@ -25,7 +25,7 @@
 |---|---|
 | No current media session | Shell remains usable; media controls are disabled |
 | Session appears, changes, or disappears | Metadata/playback state refreshes; stale session data is not retained |
-| Empty or placeholder title/artist | Empty values and common placeholders such as “Unknown artist” are treated as missing; album artist is used when available |
+| Empty or placeholder title/artist | Empty values and common placeholders such as “Unknown artist” are treated as missing; album artist is used when available; a missing artist with a valid title gets an artist-specific fallback |
 | Telegram session with no track metadata | Show “رسانهٔ فعال از Telegram” and “اطلاعات آهنگ ارائه نشده”; do not claim the actual track title was recovered |
 | Player does not support a transport command | If the command is declined, disable only that command for the current snapshot; keep the shell and other controls usable |
 | External volume or mute change | Slider and mute label update from endpoint notifications |
