@@ -19,6 +19,7 @@ public sealed class AudioService : IDisposable
     private readonly object _sync = new();
     private MMDeviceEnumerator? _enumerator;
     private MMDevice? _device;
+    private AudioEndpointVolumeNotificationDelegate? _deviceVolumeNotificationHandler;
     private EndpointNotificationClient? _notificationClient;
     private volatile bool _disposed;
 
@@ -88,7 +89,12 @@ public sealed class AudioService : IDisposable
         }
         catch
         {
-            PublishUnavailable("تغییر حجم صدا ناموفق بود");
+            // An endpoint may disappear during a write. Do not mark a newly rebound endpoint
+            // unavailable because an operation on the previous endpoint failed.
+            if (ReferenceEquals(Volatile.Read(ref _device), device))
+            {
+                PublishUnavailable("تغییر حجم صدا ناموفق بود");
+            }
         }
 
         return Task.CompletedTask;
@@ -119,31 +125,38 @@ public sealed class AudioService : IDisposable
         }
         catch
         {
-            PublishUnavailable("تغییر وضعیت قطع صدا ناموفق بود");
+            if (ReferenceEquals(Volatile.Read(ref _device), device))
+            {
+                PublishUnavailable("تغییر وضعیت قطع صدا ناموفق بود");
+            }
         }
 
         return Task.CompletedTask;
     }
 
-    private void OnVolumeNotification(AudioVolumeNotificationData notification)
+    private void OnVolumeNotification(MMDevice sourceDevice, AudioVolumeNotificationData notification)
     {
         // Core Audio invokes this callback on a COM-owned thread. Do not hold _sync here:
         // Dispose/endpoint rebinding must not block waiting for a callback that is waiting on us.
-        if (_disposed)
-        {
-            return;
-        }
-
-        var device = Volatile.Read(ref _device);
-        if (device is null)
+        if (_disposed || !ReferenceEquals(Volatile.Read(ref _device), sourceDevice))
         {
             return;
         }
 
         try
         {
-            Publish(new AudioSnapshot(true, Math.Clamp(notification.MasterVolume, 0f, 1f),
-                notification.Muted, device.FriendlyName, "Available"));
+            var snapshot = new AudioSnapshot(
+                true,
+                Math.Clamp(notification.MasterVolume, 0f, 1f),
+                notification.Muted,
+                sourceDevice.FriendlyName,
+                "Available");
+
+            // Ignore notifications that raced with a default-endpoint rebind.
+            if (!_disposed && ReferenceEquals(Volatile.Read(ref _device), sourceDevice))
+            {
+                Publish(snapshot);
+            }
         }
         catch
         {
@@ -154,7 +167,9 @@ public sealed class AudioService : IDisposable
     private void BindDefaultDevice()
     {
         MMDevice? next = null;
+        AudioEndpointVolumeNotificationDelegate? nextHandler = null;
         MMDevice? previous = null;
+        AudioEndpointVolumeNotificationDelegate? previousHandler = null;
         AudioSnapshot snapshot;
 
         lock (_sync)
@@ -167,24 +182,34 @@ public sealed class AudioService : IDisposable
             try
             {
                 next = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-                next.AudioEndpointVolume.OnVolumeNotification += OnVolumeNotification;
-                snapshot = CreateSnapshot(next);
+                var boundDevice = next;
+                nextHandler = notification => OnVolumeNotification(boundDevice, notification);
+                boundDevice.AudioEndpointVolume.OnVolumeNotification += nextHandler;
+                snapshot = CreateSnapshot(boundDevice);
+
                 previous = _device;
-                _device = next;
+                previousHandler = _deviceVolumeNotificationHandler;
+                _device = boundDevice;
+                _deviceVolumeNotificationHandler = nextHandler;
                 next = null;
+                nextHandler = null;
             }
             catch
             {
-                DisposeDevice(next);
+                DisposeDevice(next, nextHandler);
                 next = null;
+                nextHandler = null;
+
                 previous = _device;
+                previousHandler = _deviceVolumeNotificationHandler;
                 _device = null;
+                _deviceVolumeNotificationHandler = null;
                 snapshot = new AudioSnapshot(false, 0, false,
                     "خروجی صدا در دسترس نیست", "هیچ خروجی صدای پیش‌فرضی پیدا نشد");
             }
         }
 
-        DisposeDevice(previous);
+        DisposeDevice(previous, previousHandler);
         Publish(snapshot);
     }
 
@@ -202,11 +227,18 @@ public sealed class AudioService : IDisposable
     {
         try
         {
-            Publish(CreateSnapshot(device));
+            var snapshot = CreateSnapshot(device);
+            if (!_disposed && ReferenceEquals(Volatile.Read(ref _device), device))
+            {
+                Publish(snapshot);
+            }
         }
         catch
         {
-            PublishUnavailable("وضعیت خروجی صدا در دسترس نیست");
+            if (ReferenceEquals(Volatile.Read(ref _device), device))
+            {
+                PublishUnavailable("وضعیت خروجی صدا در دسترس نیست");
+            }
         }
     }
 
@@ -232,7 +264,9 @@ public sealed class AudioService : IDisposable
         StateChanged?.Invoke(snapshot);
     }
 
-    private void DisposeDevice(MMDevice? device)
+    private static void DisposeDevice(
+        MMDevice? device,
+        AudioEndpointVolumeNotificationDelegate? notificationHandler)
     {
         if (device is null)
         {
@@ -241,7 +275,10 @@ public sealed class AudioService : IDisposable
 
         try
         {
-            device.AudioEndpointVolume.OnVolumeNotification -= OnVolumeNotification;
+            if (notificationHandler is not null)
+            {
+                device.AudioEndpointVolume.OnVolumeNotification -= notificationHandler;
+            }
         }
         catch
         {
@@ -261,6 +298,7 @@ public sealed class AudioService : IDisposable
     public void Dispose()
     {
         MMDevice? device;
+        AudioEndpointVolumeNotificationDelegate? notificationHandler;
         MMDeviceEnumerator? enumerator;
         EndpointNotificationClient? notificationClient;
 
@@ -274,6 +312,8 @@ public sealed class AudioService : IDisposable
             _disposed = true;
             device = _device;
             _device = null;
+            notificationHandler = _deviceVolumeNotificationHandler;
+            _deviceVolumeNotificationHandler = null;
             enumerator = _enumerator;
             _enumerator = null;
             notificationClient = _notificationClient;
@@ -281,7 +321,7 @@ public sealed class AudioService : IDisposable
             StateChanged = null;
         }
 
-        DisposeDevice(device);
+        DisposeDevice(device, notificationHandler);
 
         if (enumerator is not null)
         {
