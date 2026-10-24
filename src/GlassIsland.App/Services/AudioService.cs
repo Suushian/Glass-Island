@@ -26,7 +26,7 @@ public sealed class AudioService : IDisposable
     public event Action<AudioSnapshot>? StateChanged;
 
     public AudioSnapshot Current { get; private set; } =
-        new(false, 0, false, "خروجی صدا در دسترس نیست", "Unavailable");
+        new(false, 0, false, "No audio output available", "Unavailable");
 
     public void Initialize()
     {
@@ -56,7 +56,7 @@ public sealed class AudioService : IDisposable
 
                 _enumerator = null;
                 _notificationClient = null;
-                PublishUnavailable("دسترسی به خروجی صدای ویندوز در دسترس نیست");
+                PublishUnavailable("Windows audio output isn't available");
                 return;
             }
         }
@@ -93,7 +93,7 @@ public sealed class AudioService : IDisposable
             // unavailable because an operation on the previous endpoint failed.
             if (ReferenceEquals(Volatile.Read(ref _device), device))
             {
-                PublishUnavailable("تغییر حجم صدا ناموفق بود");
+                PublishUnavailable("Couldn't change the volume");
             }
         }
 
@@ -127,7 +127,7 @@ public sealed class AudioService : IDisposable
         {
             if (ReferenceEquals(Volatile.Read(ref _device), device))
             {
-                PublishUnavailable("تغییر وضعیت قطع صدا ناموفق بود");
+                PublishUnavailable("Couldn't change mute state");
             }
         }
 
@@ -205,7 +205,7 @@ public sealed class AudioService : IDisposable
                 _device = null;
                 _deviceVolumeNotificationHandler = null;
                 snapshot = new AudioSnapshot(false, 0, false,
-                    "خروجی صدا در دسترس نیست", "هیچ خروجی صدای پیش‌فرضی پیدا نشد");
+                    "No audio output available", "No default audio output was found");
             }
         }
 
@@ -237,7 +237,7 @@ public sealed class AudioService : IDisposable
         {
             if (ReferenceEquals(Volatile.Read(ref _device), device))
             {
-                PublishUnavailable("وضعیت خروجی صدا در دسترس نیست");
+                PublishUnavailable("وضعیت No audio output available");
             }
         }
     }
@@ -251,7 +251,7 @@ public sealed class AudioService : IDisposable
     }
 
     private void PublishUnavailable(string status) =>
-        Publish(new AudioSnapshot(false, 0, false, "خروجی صدا در دسترس نیست", status));
+        Publish(new AudioSnapshot(false, 0, false, "No audio output available", status));
 
     private void Publish(AudioSnapshot snapshot)
     {
