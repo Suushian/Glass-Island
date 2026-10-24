@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="GlassIsland"
         Width="430"
-        Height="88"
+        Height="92"
         MinWidth="430"
         MaxWidth="430"
         WindowStyle="None"
@@ -27,45 +27,129 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="16">
+                        <Border x:Name="ButtonSurface"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="18"
+                                Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Stretch"
                                               VerticalAlignment="Stretch"
                                               RecognizesAccessKey="True" />
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="Background" Value="#FFF3F5FA" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="Background" Value="#FFE9ECF5" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="BorderBrush" Value="#FF8275E8" />
+                                <Setter TargetName="ButtonSurface" Property="BorderThickness" Value="1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Opacity" Value="0.92" />
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Opacity" Value="0.78" />
-                </Trigger>
-            </Style.Triggers>
         </Style>
-        <Style x:Key="FeatureCardStyle" TargetType="{x:Type Border}">
-            <Setter Property="Background" Value="#FF171B25" />
-            <Setter Property="BorderBrush" Value="#1FFFFFFF" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="15" />
-            <Setter Property="Padding" Value="12,11" />
+
+        <Style x:Key="TransportButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="ButtonSurface"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="Background" Value="#FFEFF1F8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="Background" Value="#FFE2E5F0" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.34" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="BorderBrush" Value="#FF8275E8" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryTransportButtonStyle"
+               TargetType="{x:Type Button}"
+               BasedOn="{StaticResource TransportButtonStyle}">
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Background" Value="{StaticResource Accent}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="ButtonSurface"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#338275E8"
+                                BorderThickness="1"
+                                CornerRadius="17">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="Background" Value="#FF7163DA" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="Background" Value="#FF6255C8" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.42" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ButtonSurface" Property="BorderBrush" Value="#FF4C3DB2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
     <Grid Margin="8">
         <Border x:Name="ShellSurface"
-                Background="#F20D1017"
-                BorderBrush="#35FFFFFF"
+                Background="{StaticResource SurfaceGlass}"
+                BorderBrush="{StaticResource SurfaceBorder}"
                 BorderThickness="1"
-                CornerRadius="26"
-                Padding="16,11">
+                CornerRadius="28"
+                Padding="14,10">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="22" ShadowDepth="4" Opacity="0.36" Color="#FF000000" />
+                <DropShadowEffect BlurRadius="28"
+                                  ShadowDepth="5"
+                                  Direction="270"
+                                  Opacity="0.16"
+                                  Color="#FF626A82" />
             </Border.Effect>
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="48" />
+                    <RowDefinition Height="54" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
@@ -76,41 +160,66 @@
                         AutomationProperties.Name="Expand or collapse GlassIsland">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="42" />
+                            <ColumnDefinition Width="46" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <Border Width="34" Height="34" CornerRadius="12"
-                                Background="#24B6A4FF"
-                                BorderBrush="#55B6A4FF"
+
+                        <Border Width="40"
+                                Height="40"
+                                CornerRadius="14"
+                                Background="{StaticResource AccentSurface}"
+                                BorderBrush="#337C70E8"
                                 BorderThickness="1"
                                 VerticalAlignment="Center">
-                            <TextBlock Text="G"
-                                       FontSize="17"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource Accent}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center" />
+                            <Viewbox Width="19" Height="19">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M 14,3 L 14,16.2 A 4.2,4.2 0 1 1 11,12.2 L 11,6.3 L 20,4 L 20,15.1 A 4.1,4.1 0 1 1 17,11.1 L 17,5.1 Z"
+                                          Fill="{StaticResource Accent}" />
+                                </Canvas>
+                            </Viewbox>
                         </Border>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0">
-                            <TextBlock Text="GlassIsland"
-                                       FontSize="14"
+
+                        <StackPanel Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Margin="10,0,0,0">
+                            <TextBlock x:Name="CollapsedTitleText"
+                                       Text="Nothing playing right now"
+                                       FontSize="13.5"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimary}" />
+                                       Foreground="{StaticResource TextPrimary}"
+                                       TextTrimming="CharacterEllipsis" />
                             <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                                <Ellipse Width="5" Height="5" Fill="#FF8BD5B0" VerticalAlignment="Center" />
-                                <TextBlock Text="  All set"
+                                <Ellipse Width="5"
+                                         Height="5"
+                                         Fill="{StaticResource Accent}"
+                                         VerticalAlignment="Center" />
+                                <TextBlock x:Name="CollapsedSubtitleText"
+                                           Text="Start playback to see your media"
                                            FontSize="10.5"
-                                           Foreground="{StaticResource TextSecondary}" />
+                                           Foreground="{StaticResource TextSecondary}"
+                                           Margin="7,0,0,0"
+                                           TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </StackPanel>
-                        <TextBlock x:Name="Chevron"
-                                   Grid.Column="2"
-                                   Text="⌄"
-                                   FontSize="20"
-                                   Foreground="#FF9CA5B5"
-                                   VerticalAlignment="Center"
-                                   Margin="12,0,4,3" />
+
+                        <Border Grid.Column="2"
+                                Width="28"
+                                Height="28"
+                                CornerRadius="10"
+                                Background="#FFF5F6FA"
+                                BorderBrush="#FFE8EAF1"
+                                BorderThickness="1"
+                                VerticalAlignment="Center"
+                                Margin="8,0,2,0">
+                            <TextBlock x:Name="Chevron"
+                                       Text="⌄"
+                                       FontSize="17"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Margin="0,-2,0,0" />
+                        </Border>
                     </Grid>
                 </Button>
 
@@ -118,42 +227,129 @@
                             Grid.Row="1"
                             Visibility="Collapsed"
                             Opacity="0"
-                            Margin="0,12,0,0">
-                    <Border Height="1" Background="#20FFFFFF" Margin="0,0,0,12" />
-                    <TextBlock Text="Media controls"
-                               FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource TextSecondary}"
-                               Margin="2,0,0,9" />
-                    <UniformGrid Columns="1" Rows="1">
-                        <Border Style="{StaticResource FeatureCardStyle}" Margin="0">
-                            <StackPanel>
-                                <TextBlock Text="MEDIA" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Accent}" />
-                                <TextBlock x:Name="MediaTitleText" Text="Nothing playing right now"
-                                           FontSize="10.5" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"
-                                           Margin="0,6,0,2" TextTrimming="CharacterEllipsis" />
-                                <TextBlock x:Name="MediaArtistText" Text="Play something and it'll show up here"
-                                           FontSize="9" Foreground="{StaticResource TextSecondary}"
-                                           TextTrimming="CharacterEllipsis" />
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
-                                    <Button x:Name="MediaPreviousButton" Content="⏮" Width="24" Height="24"
-                                            Margin="0,0,4,0" IsEnabled="False" Click="MediaPrevious_Click"
-                                            AutomationProperties.Name="Previous track" />
-                                    <Button x:Name="MediaPlayPauseButton" Content="▶" Width="28" Height="24"
-                                            Margin="0,0,4,0" IsEnabled="False" Click="MediaPlayPause_Click"
-                                            AutomationProperties.Name="Play or pause" />
-                                    <Button x:Name="MediaNextButton" Content="⏭" Width="24" Height="24"
-                                            IsEnabled="False" Click="MediaNext_Click"
-                                            AutomationProperties.Name="Next track" />
-                                </StackPanel>
-                            </StackPanel>
+                            Margin="0,12,0,2"
+                            RenderTransformOrigin="0.5,0">
+                    <StackPanel.RenderTransform>
+                        <TranslateTransform x:Name="ExpandedPanelTranslation" Y="-5" />
+                    </StackPanel.RenderTransform>
+
+                    <Border Height="1"
+                            Background="{StaticResource DividerBrush}"
+                            Margin="2,0,2,13" />
+
+                    <Grid Margin="2,0,2,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="58" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Width="50"
+                                Height="50"
+                                CornerRadius="16"
+                                Background="{StaticResource AccentSurface}"
+                                BorderBrush="#227C70E8"
+                                BorderThickness="1"
+                                VerticalAlignment="Center">
+                            <Viewbox Width="22" Height="22">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M 14,3 L 14,16.2 A 4.2,4.2 0 1 1 11,12.2 L 11,6.3 L 20,4 L 20,15.1 A 4.1,4.1 0 1 1 17,11.1 L 17,5.1 Z"
+                                          Fill="{StaticResource Accent}" />
+                                </Canvas>
+                            </Viewbox>
                         </Border>
-                    </UniformGrid>
-                    <TextBlock Text="Controls depend on what your media player supports."
+
+                        <StackPanel Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Margin="10,0,0,0">
+                            <TextBlock Text="NOW PLAYING"
+                                       FontSize="9"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource Accent}"
+                                       Margin="0,0,0,4" />
+                            <TextBlock x:Name="MediaTitleText"
+                                       Text="Nothing playing right now"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Margin="0,0,0,3" />
+                            <TextBlock x:Name="MediaArtistText"
+                                       Text="Start playback to see your media"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="0,14,0,0">
+                        <Button x:Name="MediaPreviousButton"
+                                Style="{StaticResource TransportButtonStyle}"
+                                Margin="0,0,12,0"
+                                IsEnabled="False"
+                                Click="MediaPrevious_Click"
+                                AutomationProperties.Name="Previous track"
+                                ToolTip="Previous track">
+                            <Viewbox Width="17" Height="17">
+                                <Canvas Width="18" Height="18">
+                                    <Path Data="M 3,2 L 3,16 M 15,2 L 5,9 L 15,16 Z"
+                                          Stroke="{StaticResource TextPrimary}"
+                                          StrokeThickness="1.8"
+                                          StrokeLineJoin="Round"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          Fill="Transparent" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+
+                        <Button x:Name="MediaPlayPauseButton"
+                                Style="{StaticResource PrimaryTransportButtonStyle}"
+                                Margin="0,0,12,0"
+                                IsEnabled="False"
+                                Click="MediaPlayPause_Click"
+                                AutomationProperties.Name="Play or pause"
+                                ToolTip="Play or pause">
+                            <Grid Width="20" Height="20">
+                                <Path x:Name="PlayGlyph"
+                                      Data="M 5,2 L 18,10 L 5,18 Z"
+                                      Fill="White"
+                                      Stretch="Uniform" />
+                                <Path x:Name="PauseGlyph"
+                                      Data="M 4,3 H 8 V 17 H 4 Z M 12,3 H 16 V 17 H 12 Z"
+                                      Fill="White"
+                                      Stretch="Uniform"
+                                      Visibility="Collapsed" />
+                            </Grid>
+                        </Button>
+
+                        <Button x:Name="MediaNextButton"
+                                Style="{StaticResource TransportButtonStyle}"
+                                IsEnabled="False"
+                                Click="MediaNext_Click"
+                                AutomationProperties.Name="Next track"
+                                ToolTip="Next track">
+                            <Viewbox Width="17" Height="17">
+                                <Canvas Width="18" Height="18">
+                                    <Path Data="M 3,2 L 13,9 L 3,16 Z M 15,2 L 15,16"
+                                          Stroke="{StaticResource TextPrimary}"
+                                          StrokeThickness="1.8"
+                                          StrokeLineJoin="Round"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          Fill="Transparent" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+                    </StackPanel>
+
+                    <TextBlock Text="Available controls depend on your media player."
                                FontSize="10"
-                               Foreground="#FF7F899A"
-                               Margin="2,8,0,1" />
+                               Foreground="{StaticResource TextTertiary}"
+                               TextAlignment="Center"
+                               Margin="0,10,0,0" />
                 </StackPanel>
             </Grid>
         </Border>

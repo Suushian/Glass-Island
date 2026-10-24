@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Microsoft.Win32;
@@ -12,8 +13,8 @@ namespace GlassIsland.App;
 
 public partial class MainWindow : Window
 {
-    private const double CollapsedHeight = 88;
-    private const double ExpandedHeight = 270;
+    private const double CollapsedHeight = 92;
+    private const double ExpandedHeight = 302;
     private static readonly TimeSpan MotionDuration = TimeSpan.FromMilliseconds(240);
 
     private readonly Forms.ContextMenuStrip _trayMenu;
@@ -77,7 +78,16 @@ public partial class MainWindow : Window
     {
         MediaTitleText.Text = snapshot.Title;
         MediaArtistText.Text = snapshot.Artist;
-        MediaPlayPauseButton.Content = snapshot.IsPlaying ? "Ⅱ" : "▶";
+        CollapsedTitleText.Text = snapshot.Title;
+        CollapsedSubtitleText.Text = snapshot.Artist;
+
+        PlayGlyph.Visibility = snapshot.IsPlaying ? Visibility.Collapsed : Visibility.Visible;
+        PauseGlyph.Visibility = snapshot.IsPlaying ? Visibility.Visible : Visibility.Collapsed;
+        MediaPlayPauseButton.ToolTip = snapshot.IsPlaying ? "Pause" : "Play";
+        System.Windows.Automation.AutomationProperties.SetName(
+            MediaPlayPauseButton,
+            snapshot.IsPlaying ? "Pause" : "Play");
+
         MediaPlayPauseButton.IsEnabled = snapshot.IsAvailable && snapshot.CanTogglePlayback;
         MediaPreviousButton.IsEnabled = snapshot.IsAvailable && snapshot.CanSkipPrevious;
         MediaNextButton.IsEnabled = snapshot.IsAvailable && snapshot.CanSkipNext;
@@ -104,22 +114,48 @@ public partial class MainWindow : Window
         _isExpanded = true;
         ExpandedPanel.Visibility = Visibility.Visible;
         Chevron.Text = "⌃";
+
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            ExpandedPanel.BeginAnimation(OpacityProperty, null);
+            ExpandedPanelTranslation.BeginAnimation(TranslateTransform.YProperty, null);
+            ExpandedPanel.Opacity = 1;
+            ExpandedPanelTranslation.Y = 0;
+            AnimateWindowHeight(ExpandedHeight, false);
+            return;
+        }
+
         AnimatePanelOpacity(ExpandedPanel.Opacity, 1, null);
-        AnimateWindowHeight(ExpandedHeight);
+        AnimatePanelTranslation(ExpandedPanelTranslation.Y, 0);
+        AnimateWindowHeight(ExpandedHeight, true);
     }
 
     private void Collapse()
     {
         _isExpanded = false;
         Chevron.Text = "⌄";
+
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            ExpandedPanel.BeginAnimation(OpacityProperty, null);
+            ExpandedPanelTranslation.BeginAnimation(TranslateTransform.YProperty, null);
+            ExpandedPanel.Opacity = 0;
+            ExpandedPanelTranslation.Y = -5;
+            ExpandedPanel.Visibility = Visibility.Collapsed;
+            AnimateWindowHeight(CollapsedHeight, false);
+            return;
+        }
+
         AnimatePanelOpacity(ExpandedPanel.Opacity, 0, () =>
         {
             if (!_isExpanded)
             {
                 ExpandedPanel.Visibility = Visibility.Collapsed;
+                ExpandedPanelTranslation.Y = -5;
             }
         });
-        AnimateWindowHeight(CollapsedHeight);
+        AnimatePanelTranslation(ExpandedPanelTranslation.Y, -5);
+        AnimateWindowHeight(CollapsedHeight, true);
     }
 
     private void AnimatePanelOpacity(double from, double to, Action? completed)
@@ -136,11 +172,26 @@ public partial class MainWindow : Window
         ExpandedPanel.BeginAnimation(OpacityProperty, animation);
     }
 
-    private void AnimateWindowHeight(double targetHeight)
+    private void AnimatePanelTranslation(double from, double to)
+    {
+        var animation = new DoubleAnimation(from, to, MotionDuration)
+        {
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+        };
+        ExpandedPanelTranslation.BeginAnimation(TranslateTransform.YProperty, animation);
+    }
+
+    private void AnimateWindowHeight(double targetHeight, bool animate)
     {
         var currentHeight = ActualHeight;
         BeginAnimation(HeightProperty, null);
         Height = currentHeight;
+
+        if (!animate)
+        {
+            Height = targetHeight;
+            return;
+        }
 
         var animation = new DoubleAnimation(currentHeight, targetHeight, MotionDuration)
         {
@@ -180,7 +231,7 @@ public partial class MainWindow : Window
         }
 
         // Screen.WorkingArea is in physical pixels; WPF window coordinates use DIPs.
-        var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(this);
+        var dpi = VisualTreeHelper.GetDpi(this);
         var area = workArea.Value;
         Left = (area.Left + area.Width / 2d) / dpi.DpiScaleX - Width / 2d;
         Top = area.Top / dpi.DpiScaleY + 12;
