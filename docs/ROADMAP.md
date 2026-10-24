@@ -38,11 +38,11 @@
 The notification-listener proof of concept and system audio/volume controls have been removed from the active product scope. Do not implement notification access, request notification permission, add `userNotificationListener`, or add audio endpoint controls unless the product scope is explicitly changed later. The old notification test/package workflow is not part of the media-only deliverable.
 
 **Current cleanup acceptance:**
-- [ ] UI contains only shell and media-session controls.
-- [ ] No notification or audio adapter/service remains in the app project.
-- [ ] Unused NAudio dependency is removed.
-- [ ] Product, UX, architecture, security, test, and build docs describe media-only scope.
-- [ ] Notification-specific POC and package-identity runbooks are removed.
+- [x] UI contains only shell and media-session controls.
+- [x] No notification or audio adapter/service remains in the app project.
+- [x] Unused NAudio dependency is removed.
+- [x] Product, UX, architecture, security, test, and build docs describe media-only scope.
+- [x] Notification-specific POC and package-identity runbooks are removed.
 - [ ] Windows Release build and self-contained x64 publish pass.
 
 ## Milestone 3 — quality and accessibility
