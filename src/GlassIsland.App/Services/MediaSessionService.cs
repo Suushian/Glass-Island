@@ -60,11 +60,24 @@ public sealed class MediaSessionService : IAsyncDisposable
         }
     }
 
-    public Task PlayPauseAsync() => RunTransportCommandAsync(async session => await session.TryTogglePlayPauseAsync());
-    public Task NextAsync() => RunTransportCommandAsync(async session => await session.TrySkipNextAsync());
-    public Task PreviousAsync() => RunTransportCommandAsync(async session => await session.TrySkipPreviousAsync());
+    public Task PlayPauseAsync() =>
+        RunTransportCommandAsync(
+            async session => await session.TryTogglePlayPauseAsync(),
+            snapshot => snapshot with { CanTogglePlayback = false });
 
-    private async Task RunTransportCommandAsync(Func<GlobalSystemMediaTransportControlsSession, Task<bool>> command)
+    public Task NextAsync() =>
+        RunTransportCommandAsync(
+            async session => await session.TrySkipNextAsync(),
+            snapshot => snapshot with { CanSkipNext = false });
+
+    public Task PreviousAsync() =>
+        RunTransportCommandAsync(
+            async session => await session.TrySkipPreviousAsync(),
+            snapshot => snapshot with { CanSkipPrevious = false });
+
+    private async Task RunTransportCommandAsync(
+        Func<GlobalSystemMediaTransportControlsSession, Task<bool>> command,
+        Func<MediaSnapshot, MediaSnapshot> markUnsupported)
     {
         var session = _session;
         if (_disposed || session is null)
@@ -74,9 +87,23 @@ public sealed class MediaSessionService : IAsyncDisposable
 
         try
         {
-            // A false result means this player declined the command; it does not mean the whole
-            // session is unavailable, so refresh state instead of disabling every control.
-            _ = await command(session);
+            var accepted = await command(session);
+            if (_disposed || !ReferenceEquals(session, _session))
+            {
+                return;
+            }
+
+            if (!accepted)
+            {
+                // The player declined this command. Disable only that command for this snapshot.
+                if (Current.IsAvailable)
+                {
+                    Publish(markUnsupported(Current));
+                }
+
+                return;
+            }
+
             await RefreshSnapshotAsync();
         }
         catch
@@ -136,13 +163,23 @@ public sealed class MediaSessionService : IAsyncDisposable
 
     private void Session_MediaPropertiesChanged(
         GlobalSystemMediaTransportControlsSession sender,
-        MediaPropertiesChangedEventArgs args) =>
-        _ = RefreshSnapshotAsync();
+        MediaPropertiesChangedEventArgs args)
+    {
+        if (ReferenceEquals(sender, _session))
+        {
+            _ = RefreshSnapshotAsync();
+        }
+    }
 
     private void Session_PlaybackInfoChanged(
         GlobalSystemMediaTransportControlsSession sender,
-        PlaybackInfoChangedEventArgs args) =>
-        _ = RefreshSnapshotAsync();
+        PlaybackInfoChangedEventArgs args)
+    {
+        if (ReferenceEquals(sender, _session))
+        {
+            _ = RefreshSnapshotAsync();
+        }
+    }
 
     private async Task RefreshSnapshotAsync()
     {
@@ -170,8 +207,26 @@ public sealed class MediaSessionService : IAsyncDisposable
             }
 
             var controls = playback.Controls;
-            var title = string.IsNullOrWhiteSpace(properties.Title) ? "عنوان نامشخص" : properties.Title;
-            var artist = string.IsNullOrWhiteSpace(properties.Artist) ? "هنرمند نامشخص" : properties.Artist;
+            var title = NormalizeMetadata(properties.Title);
+            var artist = NormalizeMetadata(properties.Artist);
+
+            // Some players expose the album artist even when the track artist is empty.
+            if (artist is null)
+            {
+                artist = NormalizeMetadata(properties.AlbumArtist);
+            }
+
+            var hasTrackTitle = title is not null;
+            if (title is null)
+            {
+                var sourceName = GetSourceDisplayName(session.SourceAppUserModelId);
+                title = sourceName is null ? "رسانهٔ فعال" : $"رسانهٔ فعال از {sourceName}";
+            }
+
+            if (artist is null)
+            {
+                artist = hasTrackTitle ? "هنرمند ارائه نشده" : "اطلاعات آهنگ ارائه نشده";
+            }
 
             Publish(new MediaSnapshot(
                 title,
@@ -190,6 +245,53 @@ public sealed class MediaSessionService : IAsyncDisposable
                 PublishUnavailable("اطلاعات رسانه در دسترس نیست");
             }
         }
+    }
+
+    private static string? NormalizeMetadata(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var normalized = value.Trim();
+        var placeholders = new[]
+        {
+            "unknown",
+            "unknown artist",
+            "unknown title",
+            "unknown track",
+            "unknown album artist",
+            "unknown performer",
+            "n/a",
+            "not available",
+            "نامشخص",
+            "عنوان نامشخص",
+            "هنرمند نامشخص"
+        };
+
+        return placeholders.Contains(normalized, StringComparer.OrdinalIgnoreCase)
+            ? null
+            : normalized;
+    }
+
+    private static string? GetSourceDisplayName(string? appUserModelId)
+    {
+        if (string.IsNullOrWhiteSpace(appUserModelId))
+        {
+            return null;
+        }
+
+        var source = appUserModelId.ToLowerInvariant();
+        if (source.Contains("telegram")) return "Telegram";
+        if (source.Contains("spotify")) return "Spotify";
+        if (source.Contains("msedge") || source.Contains("microsoftedge")) return "Microsoft Edge";
+        if (source.Contains("chrome")) return "Chrome";
+        if (source.Contains("firefox")) return "Firefox";
+        if (source.Contains("vlc")) return "VLC";
+        if (source.Contains("zunemusic") || source.Contains("windowsmediaplayer")) return "Media Player";
+
+        return null;
     }
 
     private void PublishUnavailable(string status) =>
