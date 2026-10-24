@@ -33,7 +33,9 @@
 | Default output device changes or disappears | Adapter rebinds or displays an explicit unavailable state |
 | App exits during callbacks | Media/audio event subscriptions and endpoint resources are released |
 
-The GSMTC API only exposes metadata published by the media player. A fallback can make missing metadata understandable, but it cannot recover a real song title that the player does not publish. These scenarios require manual execution on Windows; the current GitHub workflow validates compilation and publishing, not runtime integration behavior.
+The user manually tested the Phase 2 Windows x64 build and reported that the application and media/audio behavior work correctly, including Telegram track title and artist display. The latest Windows CI workflow validates compilation and publishing, not runtime integration behavior. Automated unit and integration tests are still not implemented, so repeat this scenario matrix for regression checks and before production release.
+
+The GSMTC API only exposes metadata published by the media player. A fallback can make missing metadata understandable, but it cannot recover a real song title that the player does not publish.
 
 ## Performance protocol
 Record Windows build, hardware, display scaling, power mode, and configuration. Warm up, measure idle for a fixed interval (e.g. five minutes), repeat at least three times, and report median/range. Record cold start to first frame, working set, idle/peak CPU, background threads/timers, media-update CPU, and backdrop/album-art impact. Compare backdrop on/off. Store raw results in a versioned report.
