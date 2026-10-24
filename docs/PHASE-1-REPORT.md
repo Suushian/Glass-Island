@@ -14,7 +14,7 @@
 - Alt+F4 hides to the tray; explicit tray Exit disposes the icon and closes the app.
 - Primary-display top-center placement, DPI conversion for the initial placement, and repositioning after Windows display-settings changes.
 - Per-monitor DPI awareness declaration in the application manifest.
-- Explicit placeholder states for later media/audio and notification integrations; no unsupported functionality is simulated.
+- Explicit placeholder states for unavailable media sessions; no unsupported functionality is simulated.
 - Windows GitHub Actions workflow for Release build and self-contained Windows x64 Debug artifact.
 - Explicit WPF startup entry via `StartupUri="MainWindow.xaml"`, fixing the published executable's missing-window startup behavior.
 
@@ -54,8 +54,8 @@
 2. The tray uses the standard Windows application icon until product branding is added.
 3. Placement currently targets the primary display; a user-selectable monitor setting is not implemented.
 4. Mixed-DPI multi-monitor behavior and taskbar/work-area edge cases still require dedicated testing.
-5. Media session controls and system audio are Phase 2; notifications remain Phase 3 and are intentionally not implemented here.
-6. The notification API decision remains gated on the Phase 3 proof of concept.
+5. Media session controls were added after Phase 1; system audio controls and notification reading are outside the current media-only product scope.
+6. The current application does not request notification access, declare notification-listener capabilities, or control system volume.
 7. No performance baseline, installer, code signing, or automated regression suite is claimed.
 
 ## Validation record
