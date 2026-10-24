@@ -23,7 +23,7 @@
 **Status:** Phase 1 basic acceptance is complete: Windows CI passed and user-reported manual smoke tests passed. Advanced multi-monitor/mixed-DPI and focus behavior remain explicit follow-up validation items. Current placement defaults to the primary display.
 
 ## Milestone 2 — media and audio
-- [x] Add an event-driven GSMTC adapter for current-session metadata/playback state and supported previous/play-pause/next commands (implementation added; Windows CI and runtime validation pending).
+- [x] Add an event-driven GSMTC adapter for current-session metadata/playback state and supported previous/play-pause/next commands (implementation added; Windows CI passed, runtime validation pending).
 - [x] Add default multimedia output volume/mute read/write and event-driven volume/default-endpoint notifications (implementation added; Windows CI and runtime validation pending).
 - [ ] Verify session changes, missing metadata, unsupported commands, external volume changes, mute, endpoint removal/rebinding, and event cleanup on Windows.
 **Exit:** success/unavailable cases are tested; event subscriptions and native resources are cleaned up; no idle polling loop. Implementation is not accepted until CI and manual Windows checks pass.
