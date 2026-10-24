@@ -4,7 +4,7 @@
 
 GlassIsland is a Windows desktop utility with a compact floating surface near the top-center of the display. The MVP target is a minimal, smoothly animated shell with controls for the active supported media session, system output volume, and Windows notifications where documented APIs and permissions allow them.
 
-> **Current status:** Phase 1 and Phase 2 are merged into `main`. Phase 2 provides Windows media-session metadata and transport controls, plus default output volume/mute controls. The latest Windows CI build and self-contained x64 Debug publish passed in [run 40092533594](https://github.com/Suushian/Glass-Island/actions/runs/40092533594), and the user confirmed the Windows build works, including correct Telegram track title and artist display. Phase 3 is underway: the first Windows notification-listener adapter and scrollable notification list are in place, and in-app copy is English-only with a friendly, conversational tone. The target is to show supported notifications from all apps after Windows permission is granted. End-to-end access remains unverified until package identity, capability declaration, and real Windows permission/runtime tests pass. See the [roadmap](docs/ROADMAP.md) and [Phase 3 notification POC](docs/PHASE-3-NOTIFICATIONS-POC.md).
+> **Current status:** Phase 1 and Phase 2 are merged into `main`. Phase 2 provides Windows media-session metadata and transport controls, plus default output volume/mute controls. The latest Windows CI build and self-contained x64 Debug publish passed in [run 40092533594](https://github.com/Suushian/Glass-Island/actions/runs/40092533594), and the user confirmed the Windows build works, including correct Telegram track title and artist display. Phase 3 is underway: the first Windows notification-listener adapter and scrollable notification list are in place, and in-app copy is English-only with a friendly, conversational tone. The target is to show supported notifications from all apps after Windows permission is granted. End-to-end access remains unverified until package identity, capability declaration, and real Windows permission/runtime tests pass. See the [roadmap](docs/ROADMAP.md), [Phase 3 notification POC](docs/PHASE-3-NOTIFICATIONS-POC.md), and [package-identity test runbook](docs/PHASE-3-PACKAGE-IDENTITY-TEST.md).
 
 ## Run locally
 
@@ -29,6 +29,8 @@ The app provides the floating shell and tray lifecycle, event-driven Windows med
 - [Testing and quality plan](docs/TESTING.md)
 - [Security and privacy](docs/SECURITY-PRIVACY.md)
 - [Build and release plan](docs/BUILD-RELEASE.md)
+- [Phase 3 notification listener POC](docs/PHASE-3-NOTIFICATIONS-POC.md)
+- [Phase 3 package-identity test runbook](docs/PHASE-3-PACKAGE-IDENTITY-TEST.md)
 - [Risks and open decisions](docs/RISKS.md)
 - [Repository structure and conventions](docs/REPOSITORY-STRUCTURE.md)
 - [Glossary](docs/GLOSSARY.md)
