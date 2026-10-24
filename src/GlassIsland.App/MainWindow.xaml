@@ -212,13 +212,17 @@
                                 BorderThickness="1"
                                 VerticalAlignment="Center"
                                 Margin="8,0,2,0">
-                            <TextBlock x:Name="Chevron"
-                                       Text="⌄"
-                                       FontSize="17"
-                                       Foreground="{StaticResource TextSecondary}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Margin="0,-2,0,0" />
+                            <Path x:Name="ChevronGlyph"
+                                  Width="10"
+                                  Height="6"
+                                  Data="M 1,1 L 5,5 L 9,1"
+                                  Stroke="{StaticResource TextSecondary}"
+                                  StrokeThickness="1.6"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
                         </Border>
                     </Grid>
                 </Button>

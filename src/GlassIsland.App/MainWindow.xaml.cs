@@ -113,7 +113,7 @@ public partial class MainWindow : Window
     {
         _isExpanded = true;
         ExpandedPanel.Visibility = Visibility.Visible;
-        Chevron.Text = "⌃";
+        ChevronGlyph.Data = Geometry.Parse("M 1,5 L 5,1 L 9,5");
 
         if (!SystemParameters.ClientAreaAnimation)
         {
@@ -133,7 +133,7 @@ public partial class MainWindow : Window
     private void Collapse()
     {
         _isExpanded = false;
-        Chevron.Text = "⌄";
+        ChevronGlyph.Data = Geometry.Parse("M 1,1 L 5,5 L 9,1");
 
         if (!SystemParameters.ClientAreaAnimation)
         {
