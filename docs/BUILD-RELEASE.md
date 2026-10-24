@@ -22,7 +22,7 @@ dotnet build .\GlassIsland.sln -c Release
 dotnet run --project .\src\GlassIsland.App\GlassIsland.App.csproj
 ```
 
-The WPF app targets `net8.0-windows`. GitHub Actions builds the solution in Release configuration and publishes a self-contained Windows x64 Debug executable. The latest recorded run succeeded, and the user confirmed the published executable starts and passes the basic shell smoke tests on Windows. This does not establish compatibility with every Windows build or display configuration.
+The WPF app targets `net8.0-windows10.0.19041.0`. The Phase 2 branch uses the Windows SDK projections provided by the target framework (do not add `Microsoft.Windows.SDK.Contracts` to this .NET 8 project) and NAudio for Core Audio. GitHub Actions builds the solution in Release configuration and publishes a self-contained Windows x64 Debug executable. Phase 1 CI and basic shell smoke tests succeeded. Phase 2 Release build and self-contained x64 Debug publish passed in [run 40089478714](https://github.com/Suushian/Glass-Island/actions/runs/40089478714); manual integration checks remain pending. This does not establish compatibility with every Windows build or display configuration.
 
 There is not yet a test project, so `dotnet test` does not provide meaningful coverage at this stage.
 

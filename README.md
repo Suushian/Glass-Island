@@ -4,7 +4,7 @@
 
 GlassIsland is a Windows desktop utility with a compact floating surface near the top-center of the display. The MVP target is a minimal, smoothly animated shell with controls for the active supported media session, system output volume, and Windows notifications where documented APIs and permissions allow them.
 
-> **Current status:** Phase 1 stable-shell implementation is complete and has passed a Windows CI build plus user-reported manual smoke tests on Windows. Startup is wired through `StartupUri="MainWindow.xaml"`. Media controls and system audio remain Phase 2; notification support remains Phase 3. See the [Phase 1 report](docs/PHASE-1-REPORT.md).
+> **Current status:** Phase 1 basic acceptance is complete. Phase 2 implementation is in progress on `feat/phase-2-media-audio-clean`: Windows media-session metadata/transport controls and default output volume/mute controls are wired to the shell. Windows CI build and self-contained x64 Debug publish passed in [run 40089478714](https://github.com/Suushian/Glass-Island/actions/runs/40089478714); manual media/device validation is still required before acceptance. Notifications remain Phase 3. See the [roadmap](docs/ROADMAP.md) and [Phase 1 report](docs/PHASE-1-REPORT.md).
 
 ## Run locally
 
@@ -16,7 +16,7 @@ dotnet build .\GlassIsland.sln -c Release
 dotnet run --project .\src\GlassIsland.App\GlassIsland.App.csproj
 ```
 
-The app provides a floating shell, expand/collapse interaction, tray show/hide/exit, and visible placeholders for features planned in later phases.
+The app provides the floating shell and tray lifecycle. The Phase 2 branch adds event-driven Windows media-session controls and default output volume/mute controls; when a session or audio endpoint is unavailable, the corresponding controls remain disabled.
 
 ## Documentation
 - [Product requirements](docs/PRODUCT.md)
@@ -43,10 +43,11 @@ The app provides a floating shell, expand/collapse interaction, tray show/hide/e
 
 ## Planned stack
 
-C# / WPF on .NET 8 for the initial shell; GSMTC for supported media sessions; Windows Core Audio for endpoint volume; notification implementation gated on a technical proof-of-concept.
+C# / WPF on .NET 8; Windows SDK projections for GSMTC media sessions; NAudio Core Audio endpoint volume and device notifications. Notification implementation remains gated on a technical proof-of-concept.
 
 ## Validation status
 
-- **Windows CI:** Release build and self-contained Windows x64 Debug publish succeeded in GitHub Actions (run [40016330117](https://github.com/Suushian/Glass-Island/actions/runs/40016330117)).
-- **Manual smoke test:** user confirmed the app starts and is visible, expand/collapse works, Escape collapses the surface, and tray Exit closes it.
-- **Not yet verified:** mixed-DPI multi-monitor edge cases, performance measurements, full compatibility matrix, automated test coverage, installer/signing, and integrations assigned to later phases.
+- **Phase 1 CI:** Release build and self-contained Windows x64 Debug publish succeeded in [run 40017882776](https://github.com/Suushian/Glass-Island/actions/runs/40017882776).
+- **Phase 1 manual smoke test:** user confirmed startup, visible shell, expand/collapse, Escape-to-collapse, and tray Exit.
+- **Phase 2:** Windows Release build and self-contained x64 Debug publish passed in [run 40089478714](https://github.com/Suushian/Glass-Island/actions/runs/40089478714). Manual validation with supported media players, external volume changes, mute, endpoint switching, and shutdown remains pending.
+- **Not yet verified:** mixed-DPI multi-monitor edge cases, performance measurements, automated regression coverage, installer/signing, and notification integration.

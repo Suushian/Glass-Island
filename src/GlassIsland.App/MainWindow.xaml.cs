@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using GlassIsland.App.Services;
 using Forms = System.Windows.Forms;
 
 namespace GlassIsland.App;
@@ -12,11 +13,14 @@ namespace GlassIsland.App;
 public partial class MainWindow : Window
 {
     private const double CollapsedHeight = 88;
-    private const double ExpandedHeight = 264;
+    private const double ExpandedHeight = 300;
     private static readonly TimeSpan MotionDuration = TimeSpan.FromMilliseconds(240);
 
     private readonly Forms.ContextMenuStrip _trayMenu;
     private readonly Forms.NotifyIcon _trayIcon;
+    private readonly MediaSessionService _mediaService = new();
+    private readonly AudioService _audioService = new();
+    private bool _updatingAudioSlider;
     private bool _isExpanded;
     private bool _allowClose;
     private bool _disposed;
@@ -40,15 +44,110 @@ public partial class MainWindow : Window
         };
         _trayIcon.DoubleClick += TrayIcon_DoubleClick;
 
+        _mediaService.StateChanged += MediaService_StateChanged;
+        _audioService.StateChanged += AudioService_StateChanged;
+
         Loaded += MainWindow_Loaded;
         Closing += MainWindow_Closing;
         SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
     }
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         PositionWindow();
         Height = CollapsedHeight;
+        _audioService.Initialize();
+        await _mediaService.InitializeAsync();
+    }
+
+    private void MediaService_StateChanged(MediaSnapshot snapshot)
+    {
+        if (Dispatcher.HasShutdownStarted)
+        {
+            return;
+        }
+
+        if (Dispatcher.CheckAccess())
+        {
+            ApplyMediaSnapshot(snapshot);
+        }
+        else
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => ApplyMediaSnapshot(snapshot)));
+        }
+    }
+
+    private void ApplyMediaSnapshot(MediaSnapshot snapshot)
+    {
+        MediaTitleText.Text = snapshot.Title;
+        MediaArtistText.Text = snapshot.Artist;
+        MediaPlayPauseButton.Content = snapshot.IsPlaying ? "Ⅱ" : "▶";
+        MediaPlayPauseButton.IsEnabled = snapshot.IsAvailable && snapshot.CanTogglePlayback;
+        MediaPreviousButton.IsEnabled = snapshot.IsAvailable && snapshot.CanSkipPrevious;
+        MediaNextButton.IsEnabled = snapshot.IsAvailable && snapshot.CanSkipNext;
+    }
+
+    private async void MediaPlayPause_Click(object sender, RoutedEventArgs e) => await _mediaService.PlayPauseAsync();
+    private async void MediaPrevious_Click(object sender, RoutedEventArgs e) => await _mediaService.PreviousAsync();
+    private async void MediaNext_Click(object sender, RoutedEventArgs e) => await _mediaService.NextAsync();
+
+    private void AudioService_StateChanged(AudioSnapshot snapshot)
+    {
+        if (Dispatcher.HasShutdownStarted)
+        {
+            return;
+        }
+
+        if (Dispatcher.CheckAccess())
+        {
+            ApplyAudioSnapshot(snapshot);
+        }
+        else
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => ApplyAudioSnapshot(snapshot)));
+        }
+    }
+
+    private void ApplyAudioSnapshot(AudioSnapshot snapshot)
+    {
+        _updatingAudioSlider = true;
+        try
+        {
+            AudioVolumeSlider.Value = snapshot.Volume * 100d;
+        }
+        finally
+        {
+            _updatingAudioSlider = false;
+        }
+
+        AudioVolumeSlider.IsEnabled = snapshot.IsAvailable;
+        AudioMuteButton.IsEnabled = snapshot.IsAvailable;
+        AudioMuteButton.Content = snapshot.IsMuted ? "فعال‌کردن صدا" : "قطع صدا";
+        AudioDeviceText.Text = snapshot.IsAvailable ? snapshot.DeviceName : snapshot.Status;
+    }
+
+    private async void AudioVolumeSlider_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (!_updatingAudioSlider)
+        {
+            await _audioService.SetVolumeAsync((float)(AudioVolumeSlider.Value / 100d));
+        }
+    }
+
+    private async void AudioVolumeSlider_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown)
+        {
+            await _audioService.SetVolumeAsync((float)(AudioVolumeSlider.Value / 100d));
+        }
+    }
+
+    private async void AudioMuteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_audioService.Current.IsAvailable)
+        {
+            await _audioService.SetMutedAsync(!_audioService.Current.IsMuted);
+        }
     }
 
     private void ToggleButton_Click(object sender, RoutedEventArgs e)
@@ -205,6 +304,10 @@ public partial class MainWindow : Window
         }
 
         _disposed = true;
+        _mediaService.StateChanged -= MediaService_StateChanged;
+        _audioService.StateChanged -= AudioService_StateChanged;
+        _ = _mediaService.DisposeAsync();
+        _audioService.Dispose();
         SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
         _trayIcon.DoubleClick -= TrayIcon_DoubleClick;
         _trayIcon.Visible = false;
