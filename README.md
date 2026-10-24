@@ -4,7 +4,7 @@
 
 GlassIsland is a Windows desktop utility with a compact floating surface near the top-center of the display. The MVP target is a minimal, smoothly animated shell with controls for the active supported media session, system output volume, and Windows notifications where documented APIs and permissions allow them.
 
-> **Current status:** Phase 1 basic acceptance is complete. Phase 2 implementation is in progress on `feat/phase-2-media-audio-clean`: Windows media-session metadata/transport controls and default output volume/mute controls are wired to the shell. This branch still requires a successful Windows CI run and manual media/device validation before acceptance. Notifications remain Phase 3. See the [roadmap](docs/ROADMAP.md) and [Phase 1 report](docs/PHASE-1-REPORT.md).
+> **Current status:** Phase 1 basic acceptance is complete. Phase 2 implementation is in progress on `feat/phase-2-media-audio-clean`: Windows media-session metadata/transport controls and default output volume/mute controls are wired to the shell. Windows CI build and self-contained x64 Debug publish passed in [run 40089478714](https://github.com/Suushian/Glass-Island/actions/runs/40089478714); manual media/device validation is still required before acceptance. Notifications remain Phase 3. See the [roadmap](docs/ROADMAP.md) and [Phase 1 report](docs/PHASE-1-REPORT.md).
 
 ## Run locally
 
@@ -49,5 +49,5 @@ C# / WPF on .NET 8; Windows SDK projections for GSMTC media sessions; NAudio Cor
 
 - **Phase 1 CI:** Release build and self-contained Windows x64 Debug publish succeeded in [run 40017882776](https://github.com/Suushian/Glass-Island/actions/runs/40017882776).
 - **Phase 1 manual smoke test:** user confirmed startup, visible shell, expand/collapse, Escape-to-collapse, and tray Exit.
-- **Phase 2:** implementation branch is awaiting a clean Windows build and manual validation with supported media players, external volume changes, mute, endpoint switching, and shutdown.
+- **Phase 2:** Windows Release build and self-contained x64 Debug publish passed in [run 40089478714](https://github.com/Suushian/Glass-Island/actions/runs/40089478714). Manual validation with supported media players, external volume changes, mute, endpoint switching, and shutdown remains pending.
 - **Not yet verified:** mixed-DPI multi-monitor edge cases, performance measurements, automated regression coverage, installer/signing, and notification integration.
