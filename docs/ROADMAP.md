@@ -23,20 +23,21 @@
 **Status:** Phase 1 basic acceptance is complete: Windows CI passed and user-reported manual smoke tests passed. Advanced multi-monitor/mixed-DPI and focus behavior remain explicit follow-up validation items. Current placement defaults to the primary display.
 
 ## Milestone 2 — media and audio
-- [x] Add an event-driven GSMTC adapter for current-session metadata/playback state and supported previous/play-pause/next commands (implementation added; Windows CI passed, runtime validation pending).
-- [x] Add default multimedia output volume/mute read/write and event-driven volume/default-endpoint notifications (implementation added; Windows CI and runtime validation pending).
-- [ ] Verify session changes, missing metadata, unsupported commands, external volume changes, mute, endpoint removal/rebinding, and event cleanup on Windows.
-**Exit:** success/unavailable cases are tested; event subscriptions and native resources are cleaned up; no idle polling loop. Implementation is not accepted until CI and manual Windows checks pass.
+- [x] Add an event-driven GSMTC adapter for current-session metadata/playback state and supported previous/play-pause/next commands.
+- [x] Add default multimedia output volume/mute read/write and event-driven volume/default-endpoint notifications.
+- [x] Manually validate media-session behavior, metadata fallbacks, unsupported transport commands, volume/mute, endpoint changes, and shutdown on Windows (user-reported acceptance).
+- [x] Confirm Telegram track title and artist display correctly on the user's Windows installation.
+**Exit:** Phase 2 implementation, Windows CI build/publish, and user-reported manual acceptance are complete. Automated regression tests and extended multi-monitor/performance testing remain follow-up quality work.
 
 ### Phase 2 metadata follow-up
 - [x] Replace empty/common placeholder title and artist values with meaningful fallbacks.
 - [x] Use album artist when the track artist is missing.
 - [x] Identify common media sources in the fallback title where GSMTC exposes a recognizable app ID.
 - [x] Disable an individual transport command when the active player declines it.
-- [ ] Confirm Telegram metadata behavior on the user's Windows installation and test session/endpoint lifecycle scenarios.
+- [x] Confirm Telegram metadata behavior on the user's Windows installation.
 - [ ] Add automated tests once the test project is introduced.
 
-**Limitation:** GSMTC only provides metadata published by the media player. The fallback improves the UI state but cannot infer the real track title when Telegram does not publish it.
+**Limitation:** GSMTC only provides metadata published by the media player. The fallback improves the UI state but cannot infer the real track title when a player does not publish it.
 
 ## Milestone 3 — notification proof-of-concept
 - Validate documented APIs, permissions, supported OS versions, and feasible scenarios.
