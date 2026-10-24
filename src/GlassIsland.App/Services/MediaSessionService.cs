@@ -60,9 +60,9 @@ public sealed class MediaSessionService : IAsyncDisposable
         }
     }
 
-    public Task PlayPauseAsync() => RunTransportCommandAsync(session => session.TryTogglePlayPauseAsync().AsTask());
-    public Task NextAsync() => RunTransportCommandAsync(session => session.TrySkipNextAsync().AsTask());
-    public Task PreviousAsync() => RunTransportCommandAsync(session => session.TrySkipPreviousAsync().AsTask());
+    public Task PlayPauseAsync() => RunTransportCommandAsync(async session => await session.TryTogglePlayPauseAsync());
+    public Task NextAsync() => RunTransportCommandAsync(async session => await session.TrySkipNextAsync());
+    public Task PreviousAsync() => RunTransportCommandAsync(async session => await session.TrySkipPreviousAsync());
 
     private async Task RunTransportCommandAsync(Func<GlobalSystemMediaTransportControlsSession, Task<bool>> command)
     {
